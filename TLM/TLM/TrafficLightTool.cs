@@ -117,31 +117,31 @@ namespace KiwiManager
             _windowRect2 = ResizeGUI(new Rect(120, 45, 300, 150));
 
             // simple
-            light_simple_1 = LoadDllResource("light_1_1.png", 103, 243);
-            light_simple_2 = LoadDllResource("light_1_2.png", 103, 243);
-            light_simple_3 = LoadDllResource("light_1_3.png", 103, 243);
+            light_simple_1 = LoadDllResource("light_1_1.png", 150, 350);
+            light_simple_2 = LoadDllResource("light_1_2.png", 150, 350);
+            light_simple_3 = LoadDllResource("light_1_3.png", 150, 350);
             // forward
-            light_forward_1 = LoadDllResource("light_2_1.png", 103, 243);
-            light_forward_2 = LoadDllResource("light_2_2.png", 103, 243);
-            light_forward_3 = LoadDllResource("light_2_3.png", 103, 243);
+            light_forward_1 = LoadDllResource("light_2_1.png", 150, 350);
+            light_forward_2 = LoadDllResource("light_2_2.png", 150, 350);
+            light_forward_3 = LoadDllResource("light_2_3.png", 150, 350);
             // right
-            light_right_1 = LoadDllResource("light_3_1.png", 103, 243);
-            light_right_2 = LoadDllResource("light_3_2.png", 103, 243);
-            light_right_3 = LoadDllResource("light_3_3.png", 103, 243);
+            light_right_1 = LoadDllResource("light_3_1.png", 150, 350);
+            light_right_2 = LoadDllResource("light_3_2.png", 150, 350);
+            light_right_3 = LoadDllResource("light_3_3.png", 150, 350);
             // left
-            light_left_1 = LoadDllResource("light_4_1.png", 103, 243);
-            light_left_2 = LoadDllResource("light_4_2.png", 103, 243);
-            light_left_3 = LoadDllResource("light_4_3.png", 103, 243);
+            light_left_1 = LoadDllResource("light_4_1.png", 150, 350);
+            light_left_2 = LoadDllResource("light_4_2.png", 150, 350);
+            light_left_3 = LoadDllResource("light_4_3.png", 150, 350);
             // forwardright
-            light_forwardright_1 = LoadDllResource("light_5_1.png", 103, 243);
-            light_forwardright_2 = LoadDllResource("light_5_2.png", 103, 243);
-            light_forwardright_3 = LoadDllResource("light_5_3.png", 103, 243);
+            light_forwardright_1 = LoadDllResource("light_5_1.png", 150, 350);
+            light_forwardright_2 = LoadDllResource("light_5_2.png", 150, 350);
+            light_forwardright_3 = LoadDllResource("light_5_3.png", 150, 350);
             // forwardleft
-            light_forwardleft_1 = LoadDllResource("light_6_1.png", 103, 243);
-            light_forwardleft_2 = LoadDllResource("light_6_2.png", 103, 243);
-            light_forwardleft_3 = LoadDllResource("light_6_3.png", 103, 243);
+            light_forwardleft_1 = LoadDllResource("light_6_1.png", 150, 350);
+            light_forwardleft_2 = LoadDllResource("light_6_2.png", 150, 350);
+            light_forwardleft_3 = LoadDllResource("light_6_3.png", 150, 350);
             // yellow
-            light_yellow = LoadDllResource("light_yellow.png", 103, 243);
+            light_yellow = LoadDllResource("light_yellow.png", 150, 350);
             // pedestrian
             pedestrian_light_1 = LoadDllResource("pedestrian_light_1.png", 73, 123);
             pedestrian_light_2 = LoadDllResource("pedestrian_light_2.png", 73, 123);
