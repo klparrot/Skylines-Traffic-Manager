@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ColossalFramework;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class TrafficLightSimulation
     {

@@ -6,7 +6,7 @@ using ColossalFramework.UI;
 using ICities;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public enum TrafficManagerMode
     {
@@ -21,13 +21,13 @@ namespace TrafficManager
             get
             {
 
-                return "Traffic Manager";
+                return "Kiwi Traffic Manager";
             }
         }
 
         public string Description
         {
-            get { return "Manage traffic junctions"; }
+            get { return "Customized traffic manager"; }
         }
     }
 

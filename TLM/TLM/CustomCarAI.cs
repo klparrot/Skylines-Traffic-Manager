@@ -5,7 +5,7 @@ using ColossalFramework;
 using ColossalFramework.Math;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     class CustomCarAI : CarAI
     {

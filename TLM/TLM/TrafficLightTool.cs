@@ -9,7 +9,7 @@ using ColossalFramework.Math;
 using ColossalFramework.UI;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class TrafficLightTool : DefaultTool
     {
@@ -164,7 +164,7 @@ namespace TrafficManager
         public static Texture2D LoadDllResource(string resourceName, int width, int height)
         {
             Assembly myAssembly = Assembly.GetExecutingAssembly();
-            Stream myStream = myAssembly.GetManifestResourceStream("TrafficManager.Resources." + resourceName);
+            Stream myStream = myAssembly.GetManifestResourceStream("KiwiManager.Resources." + resourceName);
 
             Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
 

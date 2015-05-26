@@ -9,7 +9,7 @@ using ColossalFramework.IO;
 using ICities;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class SerializableDataExtension : ISerializableDataExtension
     {
@@ -38,7 +38,7 @@ namespace TrafficManager
         {
             uniqueID = (uint)UnityEngine.Random.Range(1000000f, 2000000f);
 
-            while (File.Exists(Path.Combine(Application.dataPath, "trafficManagerSave_" + uniqueID + ".xml")))
+            while (File.Exists(Path.Combine(Application.dataPath, "kiwiManagerSave_" + uniqueID + ".xml")))
             {
                 uniqueID = (uint)UnityEngine.Random.Range(1000000f, 2000000f);
             }
@@ -72,7 +72,7 @@ namespace TrafficManager
                 uniqueID = BitConverter.ToUInt32(data, i);
             }
 
-            var filepath = Path.Combine(Application.dataPath, "trafficManagerSave_" + uniqueID + ".xml");
+            var filepath = Path.Combine(Application.dataPath, "kiwiManagerSave_" + uniqueID + ".xml");
             _timer.Enabled = false;
 
             if (!File.Exists(filepath))
@@ -245,7 +245,7 @@ namespace TrafficManager
             byte[] dataToSave = data.ToArray();
             SerializableData.SaveData(dataID, dataToSave);
 
-            var filepath = Path.Combine(Application.dataPath, "trafficManagerSave_" + uniqueID + ".xml");
+            var filepath = Path.Combine(Application.dataPath, "kiwiManagerSave_" + uniqueID + ".xml");
 
             var configuration = new Configuration();
 

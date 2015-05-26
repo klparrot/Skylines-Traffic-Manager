@@ -5,7 +5,7 @@ using System.Reflection;
 using ColossalFramework;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     class TrafficSegment
     {

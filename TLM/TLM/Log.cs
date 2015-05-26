@@ -1,9 +1,9 @@
-﻿namespace TrafficManager
+﻿namespace KiwiManager
 {
 
     public static class Log
     {
-        const string prefix = "TrafficLightManager: ";
+        const string prefix = "KiwiManager: ";
 
         public static void Message(object s)
         {

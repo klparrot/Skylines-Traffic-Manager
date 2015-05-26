@@ -7,7 +7,7 @@ using ColossalFramework.UI;
 using ICities;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class UIBase : UICustomControl
     {

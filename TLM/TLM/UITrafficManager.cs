@@ -5,7 +5,7 @@ using ColossalFramework;
 using ColossalFramework.UI;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class UITrafficManager : UIPanel
     {

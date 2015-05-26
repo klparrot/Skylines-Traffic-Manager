@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ColossalFramework;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     class ManualSegment
     {

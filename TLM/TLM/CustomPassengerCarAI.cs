@@ -4,7 +4,7 @@ using System.Text;
 using ColossalFramework;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     class CustomPassengerCarAI : CarAI
     {

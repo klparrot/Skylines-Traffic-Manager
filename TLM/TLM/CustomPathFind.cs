@@ -9,7 +9,7 @@ using ColossalFramework.Math;
 using ColossalFramework.UI;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class CustomPathFind : PathFind
     {

@@ -7,7 +7,7 @@ using ColossalFramework;
 using ColossalFramework.Math;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     public class CustomPathManager : PathManager
     {

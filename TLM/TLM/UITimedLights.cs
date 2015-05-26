@@ -4,7 +4,7 @@ using System.Text;
 using ColossalFramework.UI;
 using UnityEngine;
 
-namespace TrafficManager
+namespace KiwiManager
 {
     class UITimedLights : UIPanel
     {
