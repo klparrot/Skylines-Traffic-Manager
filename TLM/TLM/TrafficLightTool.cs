@@ -33,9 +33,11 @@ namespace KiwiManager
 
         private ushort _hoveredNetNodeIdx;
         private static ushort _selectedNetNodeIdx;
+//        private static ushort _lastHoveredNetNodeIdx;
 
         private int _hoveredSegmentIdx;
         private static int _selectedSegmentIdx;
+//        private static int _lastHoveredSegmentIdx;
 
         public static List<ushort> SelectedNodeIndexes = new List<ushort>();
         public static List<int> SelectedSegmentIndexes = new List<int>(); 
@@ -573,16 +575,14 @@ namespace KiwiManager
             {
                 var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
                 var mouseRayLength = Camera.main.farClipPlane;
-                var rayRight = Camera.main.transform.TransformDirection(Vector3.right);
+                //var rayRight = Camera.main.transform.TransformDirection(Vector3.right);
 
-                var defaultService = new ToolBase.RaycastService(ItemClass.Service.Road, ItemClass.SubService.None, ItemClass.Layer.Default);
-                var input = new ToolBase.RaycastInput(mouseRay, mouseRayLength)
-                {
-                    m_rayRight = rayRight,
-                    m_netService = defaultService,
-                    m_ignoreNodeFlags = NetNode.Flags.None,
-                    m_ignoreSegmentFlags = NetSegment.Flags.Untouchable
-                };
+                var input = new ToolBase.RaycastInput(mouseRay, mouseRayLength);
+                input.m_netService.m_service = ItemClass.Service.Road;
+                input.m_netService.m_itemLayers = ItemClass.Layer.Default | ItemClass.Layer.MetroTunnels;
+                input.m_ignoreNodeFlags = NetNode.Flags.None;
+                input.m_ignoreSegmentFlags = NetSegment.Flags.None;
+                input.m_ignoreTerrain = true;
                 RaycastOutput output;
                 if (!RayCast(input, out output))
                 {
@@ -592,8 +592,20 @@ namespace KiwiManager
                 }
 
                 _hoveredNetNodeIdx = output.m_netNode;
+                /*
+                if (_hoveredNetNodeIdx != _lastHoveredNetNodeIdx) {
+                    _lastHoveredNetNodeIdx = _hoveredNetNodeIdx;
+                    Log.Message("_hoveredNetNodeIdx = " + _hoveredNetNodeIdx);
+                }
+                */
 
                 _hoveredSegmentIdx = output.m_netSegment;
+                /*
+                if (_hoveredSegmentIdx != _lastHoveredSegmentIdx) {
+                    _lastHoveredSegmentIdx = _hoveredSegmentIdx;
+                    Log.Message("_hoveredSegmentIdx = " + _hoveredSegmentIdx);
+                }
+                */
             }
 
 
