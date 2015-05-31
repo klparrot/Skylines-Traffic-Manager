@@ -1,0 +1,9 @@
+<svg width="150" height="350" viewBox="-187.5 -437.5 375 875" xmlns="http://www.w3.org/2000/svg">
+<rect x="-175" y="-425" width="350" height="850" rx="112.5" ry="112.5" style="fill: #222; stroke: #ddd; stroke-width: 12.5;" />
+<circle cx="0" cy="-250" r="100" style="fill: #000; stroke: none;" />
+<path id="arrow" style="fill: none; stroke: #f00; stroke-linecap: round; stroke-linejoin: round; stroke-width: 25;" d="M -75 -250 L -25 -250 M 0 -325 L 75 -250 L 0 -175" />
+<circle cx="0" cy="0" r="100" style="fill: #000; stroke: none;" />
+<path id="arrow" style="fill: none; stroke: #ff0; stroke-linecap: round; stroke-linejoin: round; stroke-width: 25;" d="M -75 0 L -25 0 M 0 -75 L 75 0 L 0 75" />
+<circle cx="0" cy="250" r="100" style="fill: #000; stroke: none;" />
+<path id="arrow" style="fill: none; stroke: #030; stroke-linecap: round; stroke-linejoin: round; stroke-width: 25;" d="M -75 250 L -25 250 M 0 175 L 75 250 L 0 325" />
+</svg>

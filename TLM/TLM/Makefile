@@ -89,5 +89,8 @@ NOWARN := -nowarn:108,109,114,168,169,219,414,649
 KiwiTLM.dll: Mono $(Compile) $(EmbeddedResource)
 	Mono/bin/gmcs $(if $(WARN),,$(NOWARN)) -unsafe+ -out:$@ -t:library -lib:'$(Cities)/Contents/Resources/Data/Managed' $(addprefix -r:,$(Reference)) $(Compile) $(foreach res,$(EmbeddedResource),-res:$(res)$(comma)KiwiManager.$(subst /,.,$(res)))
 
+Resources/%.png: Resources/SVG/%.svg
+	$(if $(ImageMagick),$(ImageMagick)/bin/)convert -background none $< +set date:create +set date:modify +set svg:comment $@
+
 
 .PHONY: all clean install warn
