@@ -398,15 +398,11 @@ namespace TrafficManager
 
                         if (segment.m_startNode == _selectedNetNodeIdx)
                         {
-                            position.x += segment.m_startDirection.x*10f;
-                            position.y += segment.m_startDirection.y*10f;
-                            position.z += segment.m_startDirection.z*10f;
+                            position += segment.m_startDirection * 10f;
                         }
                         else
                         {
-                            position.x += segment.m_endDirection.x*10f;
-                            position.y += segment.m_endDirection.y*10f;
-                            position.z += segment.m_endDirection.z*10f;
+                            position += segment.m_endDirection * 10f;
                         }
 
                         if (nodeSimulation == null || !TrafficLightsManual.IsSegmentLight(_selectedNetNodeIdx, segmentId))
@@ -959,15 +955,11 @@ namespace TrafficManager
 
                         if (segment.m_startNode == _selectedNetNodeIdx)
                         {
-                            position.x += segment.m_startDirection.x * offset;
-                            position.y += segment.m_startDirection.y * offset;
-                            position.z += segment.m_startDirection.z * offset;
+                            position += segment.m_startDirection * offset;
                         }
                         else
                         {
-                            position.x += segment.m_endDirection.x * offset;
-                            position.y += segment.m_endDirection.y * offset;
-                            position.z += segment.m_endDirection.z * offset;
+                            position += segment.m_endDirection * offset;
                         }
 
                         var guiColor = GUI.color;
@@ -1452,15 +1444,11 @@ namespace TrafficManager
 
             if (segment.m_startNode == _selectedNetNodeIdx)
             {
-                position.x += segment.m_startDirection.x * offset;
-                position.y += segment.m_startDirection.y * offset;
-                position.z += segment.m_startDirection.z * offset;
+                position += segment.m_startDirection * offset;
             }
             else
             {
-                position.x += segment.m_endDirection.x * offset;
-                position.y += segment.m_endDirection.y * offset;
-                position.z += segment.m_endDirection.z * offset;
+                position += segment.m_endDirection * offset;
             }
 
             var guiColor = GUI.color;
@@ -1576,15 +1564,11 @@ namespace TrafficManager
 
                         if (segment.m_startNode == SelectedNodeIndexes[i2])
                         {
-                            position.x += segment.m_startDirection.x * offset;
-                            position.y += segment.m_startDirection.y * offset;
-                            position.z += segment.m_startDirection.z * offset;
+                            position += segment.m_startDirection * offset;
                         }
                         else
                         {
-                            position.x += segment.m_endDirection.x * offset;
-                            position.y += segment.m_endDirection.y * offset;
-                            position.z += segment.m_endDirection.z * offset;
+                            position += segment.m_endDirection * offset;
                         }
 
                         var guiColor = GUI.color;
@@ -3504,15 +3488,11 @@ namespace TrafficManager
 
                         if (segment.m_startNode == _selectedNetNodeIdx)
                         {
-                            position.x += segment.m_startDirection.x * 10f;
-                            position.y += segment.m_startDirection.y * 10f;
-                            position.z += segment.m_startDirection.z * 10f;
+                            position += segment.m_startDirection * 10f;
                         }
                         else
                         {
-                            position.x += segment.m_endDirection.x * 10f;
-                            position.y += segment.m_endDirection.y * 10f;
-                            position.z += segment.m_endDirection.z * 10f;
+                            position += segment.m_endDirection * 10f;
                         }
 
                         var screenPos = Camera.main.WorldToScreenPoint(position);
