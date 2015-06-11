@@ -168,7 +168,7 @@ namespace KiwiManager
             Assembly myAssembly = Assembly.GetExecutingAssembly();
             Stream myStream = myAssembly.GetManifestResourceStream("KiwiManager.Resources." + resourceName);
 
-            Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            Texture2D texture = new Texture2D(0,0);
 
             texture.LoadImage(ReadToEnd(myStream));
 

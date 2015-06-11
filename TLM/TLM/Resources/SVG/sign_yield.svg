@@ -1,0 +1,31 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<!--svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="200" height="200" viewBox="-433 -366 866 866"-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="-400 -350 800 800">
+<!--rect x="-433" y="-366" width="866" height="866" style="fill: red; stroke:none;" /-->
+<!--path style="stroke: none; fill: grey;" d="M346.39872980612057 -250a50 50 0 0 1 43.301587735363 74.999449985882904L43.30158773536299 424.9972498810109a50 50 0 0 1 -86.60317547072599 0L-389.70031754148357 -175.0005500141171a50 50 0 0 1 43.301587735363 -74.999449985882904z" />
+<path style="stroke: none; fill: red;" d="M346.39872980612057 -240a40 40 0 0 1 34.6412701882904 59.999559988706324L43.30158773536299 424.9972498810109a50 50 0 0 1 -86.60317547072599 0L-381.03999999441095 -180.00044001129368 a40 40 0 0 1 34.6412701882904 -59.999559988706324z" /-->
+<path style="stroke: white; stroke-width: 10; fill: red;" d="M346.39872980612057 -245a45 45 0 0 1 38.971428961826696 67.49950498729461 L 38.9714289618267 400.4977888948457 a 45 45 0 0 1 -77.9428579236534 0L-385.37015876794726 -177.5004950127054 A 45 45 0 0 1 -346.39872980612057 -245 Z" />
+<!--path style="stroke: none; fill: white;" d="M324.74761839695554 -175L0 387.49587482151645L-324.74761839695554 -175z" /-->
+<path style="stroke: none; fill: white;" d="M433 -250 L0 500 L-433 -250 Z" transform="scale(0.7)"/>
+<path id="give" style="stroke: none; fill: #E20A16;" transform="translate(0, -120) scale(0.43859649122807015) translate(-350, 285) scale(1,-1)" d="
+M0 0m185 79q0 -28 -8 -44q-18 -40 -63 -40q-52 0 -73 49q-15 35 -15 98q0 61 13 96q8 23 28 37.5t44 14.5q31 0 52 -20.5t22 -51.5h-41q-2 32 -34 32q-22 0 -32 -21q-13 -23 -13 -80q0 -38 6 -71q9 -43 42 -43q31 0 31 44v19h-32v40h73v-59z
+
+M211 0m71 0h-40v285h40v-285z
+
+M314 0m185 285l-73 -285h-31l-72 285h41l47 -185l47 185h41z
+
+M507 0m176 0h-145v285h134v-40h-93v-72h59v-39h-59v-94h104v-40z
+
+M700 0
+" />
+<path id="way" style="stroke: none; fill: red;" transform="translate(0, 70) scale(0.3508771929824561) translate(-270.5, 285) scale(1,-1)" d="
+M0 0m190 285l-33 -285h-31l-27 160l-26 -160h-31l-33 285h37l15 -132l23 132h31l23 -132l15 132h37z
+
+M199 0m163 0h-38l-16 76h-47l-16 -76h-37l58 285h37z
+M199 0m101 113l-15 75l-16 -75h31z
+
+M370 0m162 285l-58 -156v-129h-37v129l-58 156h39l38 -100l37 100h39z
+M541 0
+" />
+</svg>
