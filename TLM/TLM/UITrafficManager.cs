@@ -324,8 +324,8 @@ namespace KiwiManager
             if (p1 != null && p2 != null)
             {
                 writer.Write(" C");
-                writeCoord(p1, writer);
-                writeCoord(p2, writer);
+                writeCoord(p1.Value, writer);
+                writeCoord(p2.Value, writer);
             }
             else
             {
@@ -657,12 +657,8 @@ namespace KiwiManager
                 polys.Sort();
                 foreach (BezierPath e in polys)
                 {
-                    writer.Write("<path id=\"{0}\" d=\"M", e.name);
-                    writeCoord(e.P0, writer);
-                    writer.Write(" C");
-                    writeCoord(e.P1, writer);
-                    writeCoord(e.P2, writer);
-                    writeCoord(e.P3, writer);
+                    writer.Write("<path id=\"{0}\" d=\"", e.name);
+                    writePath(writer, e.P0, e.P1, e.P2, e.P3);
                     writer.WriteLine("\" class=\"{0}\" />", e.cssclass);
                 }
                 writer.Write("</svg>\n");
