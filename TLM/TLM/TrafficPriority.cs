@@ -148,17 +148,11 @@ namespace KiwiManager
                             {
                                 if (prioritySegment.type == PrioritySegment.PriorityType.Main)
                                 {
-                                    numCars += prioritySegment.numCars;
+                                    numCars += prioritySegment.cars.Count;
 
-                                    foreach (var car in prioritySegment.cars)
+                                    foreach (ushort car in prioritySegment.cars)
                                     {
-                                        if (vehicleList[car].lastSpeed > 0.1f)
-                                        {
-                                            numCars = checkSameRoadIncomingCar(targetCar, car, nodeID)
-                                                ? numCars - 1
-                                                : numCars;
-                                        }
-                                        else
+                                        if (vehicleList[car].lastSpeed <= 0.1f || checkSameRoadIncomingCar(targetCar, car, nodeID))
                                         {
                                             numCars--;
                                         }
@@ -167,32 +161,20 @@ namespace KiwiManager
                             }
                             else
                             {
-                                numCars += prioritySegment.numCars;
+                                numCars += prioritySegment.cars.Count;
 
-                                foreach (var car in prioritySegment.cars)
+                                foreach (ushort car in prioritySegment.cars)
                                 {
                                     if (prioritySegment.type == PrioritySegment.PriorityType.Main)
                                     {
-                                        if (!vehicleList[car].stopped)
-                                        {
-                                            numCars = checkPriorityRoadIncomingCar(targetCar, car, nodeID)
-                                                ? numCars - 1
-                                                : numCars;
-                                        }
-                                        else
+                                        if (vehicleList[car].stopped || checkSameRoadIncomingCar(targetCar, car, nodeID))
                                         {
                                             numCars--;
                                         }
                                     }
                                     else
                                     {
-                                        if (vehicleList[car].lastSpeed > 0.1f)
-                                        {
-                                            numCars = checkSameRoadIncomingCar(targetCar, car, nodeID)
-                                                ? numCars - 1
-                                                : numCars;
-                                        }
-                                        else
+                                        if (vehicleList[car].lastSpeed <= 0.1f || checkSameRoadIncomingCar(targetCar, car, nodeID))
                                         {
                                             numCars--;
                                         }
@@ -208,17 +190,11 @@ namespace KiwiManager
 
                                 if (segmentLight.GetLightMain() == RoadBaseAI.TrafficLightState.Green)
                                 {
-                                    numCars += prioritySegment.numCars;
+                                    numCars += prioritySegment.cars.Count;
 
-                                    foreach (var car in prioritySegment.cars)
+                                    foreach (ushort car in prioritySegment.cars)
                                     {
-                                        if (vehicleList[car].lastSpeed > 1f)
-                                        {
-                                            numCars = checkSameRoadIncomingCar(targetCar, car, nodeID)
-                                                ? numCars - 1
-                                                : numCars;
-                                        }
-                                        else
+                                        if (vehicleList[car].lastSpeed <= 1f || checkSameRoadIncomingCar(targetCar, car, nodeID))
                                         {
                                             numCars--;
                                         }
@@ -230,14 +206,7 @@ namespace KiwiManager
                 }
             }
 
-            if (numCars > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (numCars > 0);
         }
 
         public static bool checkSameRoadIncomingCar(ushort targetCarID, ushort incomingCarID, ushort nodeID)
@@ -814,7 +783,13 @@ namespace KiwiManager
 
         public PriorityType type = PriorityType.Main;
 
-        public int numCars = 0;
+        public int ComparablePriority
+        {
+            get
+            {
+                return 2 ^ (int) type;
+            }
+        }
 
         public List<ushort> cars = new List<ushort>(); 
 
@@ -832,7 +807,6 @@ namespace KiwiManager
             if (!cars.Contains(vehicleID))
             {
                 cars.Add(vehicleID);
-                numCars++;
                 _numCarsOnLane();
             }
         }
@@ -842,7 +816,6 @@ namespace KiwiManager
             if (cars.Contains(vehicleID))
             {
                 cars.Remove(vehicleID);
-                numCars--;
                 _numCarsOnLane();
             }
         }
