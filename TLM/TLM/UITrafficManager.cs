@@ -311,11 +311,11 @@ namespace KiwiManager
 
         private void writeCoord(Vector3 coord, StreamWriter writer)
         {
-            writer.Write(" {0,7:F1} {1,7:F1}", coord.x, -coord.z);
+            writer.Write(" {0,8:F2} {1,8:F2}", coord.x, -coord.z);
         }
         private void writeCoord(Vector2 coord, StreamWriter writer)
         {
-            writer.Write(" {0,7:F1} {1,7:F1}", coord.x, coord.y);
+            writer.Write(" {0,8:F2} {1,8:F2}", coord.x, coord.y);
         }
         private void writePath(StreamWriter writer, Vector2 p0, Vector2? p1, Vector2? p2, Vector2? p3)
         {
@@ -397,11 +397,42 @@ namespace KiwiManager
                 writer.Write(" {0}=\"{1:F}\"", "m_finalDirection", lane.m_finalDirection);
                 writer.Write(" {0}=\"{1}\"", "m_similarLaneIndex", lane.m_similarLaneIndex);
                 writer.Write(" {0}=\"{1}\"", "m_similarLaneCount", lane.m_similarLaneCount);
-                writer.WriteLine(" />");
+                if (lane.m_laneProps != null)
+                {
+                    writer.WriteLine(">");
+                    foreach (NetLaneProps.Prop prop in lane.m_laneProps.m_props)
+                    {
+                        writer.Write("\t\t<Prop");
+                        writer.Write(" {0}=\"{1:F}\"", "m_flagsRequired", prop.m_flagsRequired);
+                        writer.Write(" {0}=\"{1:F}\"", "m_flagsForbidden", prop.m_flagsForbidden);
+                        writer.Write(" {0}=\"{1:F}\"", "m_startFlagsRequired", prop.m_startFlagsRequired);
+                        writer.Write(" {0}=\"{1:F}\"", "m_startFlagsForbidden", prop.m_startFlagsForbidden);
+                        writer.Write(" {0}=\"{1:F}\"", "m_endFlagsRequired", prop.m_endFlagsRequired);
+                        writer.Write(" {0}=\"{1:F}\"", "m_endFlagsForbidden", prop.m_endFlagsForbidden);
+                        writer.Write(" {0}=\"{1}\"", "m_colorMode", prop.m_colorMode);
+                        writer.Write(" {0}=\"{1}\"", "m_prop", prop.m_prop);
+                        writer.Write(" {0}=\"{1}\"", "m_tree", prop.m_tree);
+                        writer.Write(" {0}=\"{1}\"", "m_position", prop.m_position);
+                        writer.Write(" {0}=\"{1}\"", "m_angle", prop.m_angle);
+                        writer.Write(" {0}=\"{1}\"", "m_segmentOffset", prop.m_segmentOffset);
+                        writer.Write(" {0}=\"{1}\"", "m_repeatDistance", prop.m_repeatDistance);
+                        writer.Write(" {0}=\"{1}\"", "m_minLength", prop.m_minLength);
+                        writer.Write(" {0}=\"{1}\"", "m_cornerAngle", prop.m_cornerAngle);
+                        writer.Write(" {0}=\"{1}\"", "m_probability", prop.m_probability);
+                        writer.Write(" {0}=\"{1}\"", "m_finalProp", prop.m_finalProp);
+                        writer.Write(" {0}=\"{1}\"", "m_finalTree", prop.m_finalTree);
+                        writer.WriteLine(" />");
+                    }
+                    writer.WriteLine("\t</Lane>");
+                }
+                else
+                {
+                    writer.WriteLine(" />");
+                }
             }
             writer.WriteLine("</NetInfo>");
         }
-        private class BezierPath : IComparable<BezierPath>
+        private class PathSegment : IComparable<PathSegment>
         {
             public float zlevel;
             public int zindex;
@@ -412,7 +443,7 @@ namespace KiwiManager
             public Vector2? P1;
             public Vector2? P2;
             public Vector2? P3;
-            public BezierPath(float zlevel, int zindex, float zorder, string name, string cssclass, Vector2 p0, Vector2? p1, Vector2? p2, Vector2? p3)
+            public PathSegment(float zlevel, int zindex, float zorder, string name, string cssclass, Vector2 p0, Vector2? p1, Vector2? p2, Vector2? p3)
             {
                 this.zlevel = zlevel;
                 this.zindex = zindex;
@@ -424,7 +455,7 @@ namespace KiwiManager
                 this.P2 = p2;
                 this.P3 = p3;
             }
-            public int CompareTo(BezierPath other)
+            public int CompareTo(PathSegment other)
             {
                 if (this.zlevel < other.zlevel) return -1;
                 if (this.zlevel > other.zlevel) return 1;
@@ -455,6 +486,8 @@ namespace KiwiManager
                         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\" >\n" +
 //                        "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"1080\" height=\"1080\" viewBox=\"-8640 -8640 17280 17280\">\n" +
                         "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"1440\" height=\"960\" viewBox=\"-1920 -1920 5760 3840\">\n" +
+                        "<rect id=\"map\" x=\"-8640\" y=\"-8640\" width=\"17280\" height=\"17280\" style=\"stroke: none; fill: #EFD;\" />\n" +
+                        "<rect id=\"city\" x=\"-960\" y=\"-960\" width=\"3840\" height=\"1920\" style=\"stroke: none; fill: #EEE;\" />\n" +
                         "<style language=\"text/css\"> /* <![CDATA[ */\n" +
                         "path {\n" +
                         "    fill: none;\n" +
@@ -472,6 +505,10 @@ namespace KiwiManager
                         "{\n" +
                         "    display: none;\n" +
                         "}\n" +
+                        ".Gravel.Road\n" +
+                        "{\n" +
+                        "    stroke: #FFF;\n" +
+                        "}\n" +
                         ".Dam,\n" +
                         ".Basic,\n" +
                         ".Oneway.Road:not(.outline)\n" +
@@ -481,6 +518,11 @@ namespace KiwiManager
                         ".Medium\n" +
                         "{\n" +
                         "    stroke: #FC9;\n" +
+                        "    stroke-width: 15;\n" +
+                        "}\n" +
+                        ".Medium.outline\n" +
+                        "{\n" +
+                        "    stroke-width: 17;\n" +
                         "}\n" +
                         ".Large\n" +
                         "{\n" +
@@ -522,41 +564,11 @@ namespace KiwiManager
                         "}\n" +
                         ".Train\n" +
                         "{\n" +
-                        "    stroke: #333;\n" +
+                        "    stroke: #363;\n" +
                         "    stroke-width: 4;\n" +
                         "}\n" +
-                        /*
-                        ".Basic.Road,\n" +
-                        ".Gravel.Road,\n" +
-                        ".Oneway.Road\n" +
-                        "{\n" +
-                        "    stroke-width: 6;\n" +
-                        "}\n" +
-                        ".Basic.Road.outline,\n" +
-                        ".Gravel.Road.outline,\n" +
-                        ".Oneway.Road.outline\n" +
-                        "{\n" +
-                        "    stroke-width: 8;\n" +
-                        "}\n" +
-                        ".HighwayRamp\n" +
-                        "{\n" +
-                        "    stroke-width: 8;\n" +
-                        "}\n" +
-                        ".HighwayRamp.outline\n" +
-                        "{\n" +
-                        "    stroke-width: 10;\n" +
-                        "}\n" +
-                        ".Highway\n" +
-                        "{\n" +
-                        "    stroke-width: 12;\n" +
-                        "}\n" +
-                        ".Highway.outline\n" +
-                        "{\n" +
-                        "    stroke-width: 14;\n" +
-                        "}\n" +
-                        */
                         "");
-                Dictionary<NetInfo, bool> dict = new Dictionary<NetInfo, bool>();
+                Dictionary<NetInfo, uint> dict = new Dictionary<NetInfo, uint>();
                 for (int i = 0; i < NetManager.MAX_SEGMENT_COUNT; ++i)
                 {
                     NetSegment ns = nm.m_segments.m_buffer[i];
@@ -569,11 +581,21 @@ namespace KiwiManager
                                 ns.Info.name.Contains("Path") ||
                                 ns.Info.name.Contains("Pipe"))
                             {
-                                dict[ns.Info] = false;
+                                dict[ns.Info] = 0;
+                                continue;
                             }
+                            else if (ns.Info.name.StartsWith("Pedestrian")) { dict[ns.Info] = 1; }
+                            else if (ns.Info.name.StartsWith("HighwayRamp")) { dict[ns.Info] = 2; }
+                            else if (ns.Info.name.StartsWith("Gravel")) { dict[ns.Info] = 3; }
+                            else if (ns.Info.name.StartsWith("Basic") || ns.Info.name.StartsWith("Oneway") || ns.Info.name.StartsWith("Dam")) { dict[ns.Info] = 4; }
+                            else if (ns.Info.name.StartsWith("Medium")) { dict[ns.Info] = 5; }
+                            else if (ns.Info.name.StartsWith("Large")) { dict[ns.Info] = 6; }
+                            else if (ns.Info.name.StartsWith("Highway")) { dict[ns.Info] = 7; }
+                            else if (ns.Info.name.StartsWith("Train")) { dict[ns.Info] = 8; }
                             else
                             {
-                                dict[ns.Info] = true;
+                                dict[ns.Info] = 0;
+                                writer.WriteLine("/* {0} ??? */", ns.Info.name);
                                 continue;
                             }
                             if (ns.Info.name.EndsWith("Tunnel") || ns.Info.name.EndsWith("Slope") || ns.Info.name.EndsWith("Elevated") || ns.Info.name.EndsWith("Bridge"))
@@ -606,37 +628,47 @@ namespace KiwiManager
                     dumpNetInfo(ni, writer);
                 }
                 writer.WriteLine("-->");
-                List<BezierPath> polys = new List<BezierPath>();
-                //Dictionary<NetInfo, bool> dict = new Dictionary<NetInfo, bool>();
+                List<PathSegment> polys = new List<PathSegment>();
+                List<PathSegment> underground = new List<PathSegment>();
+                List<PathSegment> medians = new List<PathSegment>();
                 for (int i = 0; i < NetManager.MAX_SEGMENT_COUNT; ++i)
                 {
                     NetSegment ns = nm.m_segments.m_buffer[i];
                     if ((ns.m_flags & NetSegment.Flags.Created) != 0)
                     {
-                        if (!dict.ContainsKey(ns.Info))
-                        {
-                            if (ns.Info.name.Contains("Line") ||
-                                ns.Info.name.Contains("Connection") ||
-                                ns.Info.name.Contains("Path") ||
-                                ns.Info.name.Contains("Pipe"))
-                            {
-                                dict[ns.Info] = false;
-                            }
-                            else
-                            {
-                                dict[ns.Info] = true;
-                            }
-                        }
-                        bool comment = !dict[ns.Info] ||
+                        uint order = dict[ns.Info];
+                        bool comment = order == 0 ||
                             outOfBounds(nm.m_nodes.m_buffer[ns.m_startNode].m_position, nm.m_nodes.m_buffer[ns.m_endNode].m_position);
+                        float startZ = nm.m_nodes.m_buffer[ns.m_startNode].m_position.y;
+                        float endZ = nm.m_nodes.m_buffer[ns.m_endNode].m_position.y;
                         Vector3 middlePos1;
                         Vector3 middlePos2;
                         NetSegment.CalculateMiddlePoints(nm.m_nodes.m_buffer[ns.m_startNode].m_position,
                                 ns.m_startDirection, nm.m_nodes.m_buffer[ns.m_endNode].m_position,
                                 ns.m_endDirection, true, true, out middlePos1, out middlePos2);
                         string cssclass = ns.Info.name == "HighwayRampElevated" ? "HighwayRamp Elevated" : ns.Info.name;
+                        bool hasMedian = cssclass.StartsWith("Medium ");
+                        List<PathSegment> startL = polys;
+                        List<PathSegment> endL = polys;
+                        if (cssclass.EndsWith(" Tunnel"))
+                        {
+                            startL = underground;
+                            endL = underground;
+                        }
+                        else if (cssclass.EndsWith(" Slope"))
+                        {
+                            if (startZ < endZ)
+                            {
+                                startL = underground;
+                            }
+                            else
+                            {
+                                endL = underground;
+                            }
+                        }
                         if (comment)
                         {
+                            /*
                             writer.Write("<!--");
                             writer.Write("<path id=\"seg0x{0:X4}\" d=\"M", i);
                             writeCoord(nm.m_nodes.m_buffer[ns.m_startNode].m_position, writer);
@@ -646,31 +678,29 @@ namespace KiwiManager
                             writeCoord(nm.m_nodes.m_buffer[ns.m_endNode].m_position, writer);
                             writer.Write("\" class=\"{0}\" />", cssclass);
                             writer.WriteLine("-->");
+                            */
                         }
                         else if (NetSegment.IsStraight(nm.m_nodes.m_buffer[ns.m_startNode].m_position, ns.m_startDirection, nm.m_nodes.m_buffer[ns.m_endNode].m_position, ns.m_endDirection))
                         {
                             Vector2 oa = new Vector2(nm.m_nodes.m_buffer[ns.m_startNode].m_position.x, -nm.m_nodes.m_buffer[ns.m_startNode].m_position.z);
                             Vector2 od = new Vector2(nm.m_nodes.m_buffer[ns.m_endNode].m_position.x, -nm.m_nodes.m_buffer[ns.m_endNode].m_position.z);
                             Vector2 oad = (oa + od) / 2;
-                            float startZ = nm.m_nodes.m_buffer[ns.m_startNode].m_position.y;
-                            float endZ = nm.m_nodes.m_buffer[ns.m_endNode].m_position.y;
+
                             if (startZ < endZ)
                             {
-                                polys.Add(new BezierPath(startZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-3-0", i), cssclass + " outline", oa, null, null, oad));
-                                polys.Add(new BezierPath(startZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-3-1", i), cssclass, oa, null, null, oad));
-                                Vector2 oaddd = (oad + od) / 2;
-                                polys.Add(new BezierPath(endZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-8-2", i), cssclass + " outline", oaddd, null, null, od));
-                                polys.Add(new BezierPath(endZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-4-2", i), cssclass + " outline link", oad, null, null, oaddd));
-                                polys.Add(new BezierPath(endZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-C-3", i), cssclass, oad, null, null, od));
+                                startL.Add(new PathSegment(startZ, 0, order, String.Format("seg-0x{0:X4}-3-0", i), cssclass + " outline", oa, null, null, oad));
+                                startL.Add(new PathSegment(startZ, 1, order, String.Format("seg-0x{0:X4}-3-1", i), cssclass, oa, null, null, oad));
+                                endL.Add(new PathSegment(endZ, 0, order, String.Format("seg-0x{0:X4}-8-2", i), cssclass + " outline", od, null, null, null));
+                                endL.Add(new PathSegment(endZ, 0, order, String.Format("seg-0x{0:X4}-C-2", i), cssclass + " outline link", oad, null, null, od));
+                                endL.Add(new PathSegment(endZ, 1, order, String.Format("seg-0x{0:X4}-C-3", i), cssclass, oad, null, null, od));
                             }
                             else
                             {
-                                polys.Add(new BezierPath(endZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-C-0", i), cssclass + " outline", oad, null, null, od));
-                                polys.Add(new BezierPath(endZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-C-1", i), cssclass, oad, null, null, od));
-                                Vector2 oaaad = (oa + oad) / 2;
-                                polys.Add(new BezierPath(startZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-1-2", i), cssclass + " outline", oa, null, null, oaaad));
-                                polys.Add(new BezierPath(startZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-2-2", i), cssclass + " outline link", oaaad, null, null, oad));
-                                polys.Add(new BezierPath(startZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-3-3", i), cssclass, oa, null, null, oad));
+                                endL.Add(new PathSegment(endZ, 0, order, String.Format("seg-0x{0:X4}-C-0", i), cssclass + " outline", oad, null, null, od));
+                                endL.Add(new PathSegment(endZ, 1, order, String.Format("seg-0x{0:X4}-C-1", i), cssclass, oad, null, null, od));
+                                startL.Add(new PathSegment(startZ, 0, order, String.Format("seg-0x{0:X4}-1-2", i), cssclass + " outline", oa, null, null, null));
+                                startL.Add(new PathSegment(startZ, 0, order, String.Format("seg-0x{0:X4}-3-2", i), cssclass + " outline link", oa, null, null, oad));
+                                startL.Add(new PathSegment(startZ, 1, order, String.Format("seg-0x{0:X4}-3-3", i), cssclass, oa, null, null, oad));
                             }
                         }
                         else
@@ -681,33 +711,36 @@ namespace KiwiManager
                             Vector2 od = new Vector2(nm.m_nodes.m_buffer[ns.m_endNode].m_position.x, -nm.m_nodes.m_buffer[ns.m_endNode].m_position.z);
                             Vector2 oab, oabbc, oabbcbccd, obccd, ocd;
                             BezierBisect(oa, ob, oc, od, out oab, out oabbc, out oabbcbccd, out obccd, out ocd);
-                            float startZ = nm.m_nodes.m_buffer[ns.m_startNode].m_position.y;
-                            float endZ = nm.m_nodes.m_buffer[ns.m_endNode].m_position.y;
                             if (startZ < endZ)
                             {
-                                polys.Add(new BezierPath(startZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-3-0", i), cssclass + " outline", oa, oab, oabbc, oabbcbccd));
-                                polys.Add(new BezierPath(startZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-3-1", i), cssclass, oa, oab, oabbc, oabbcbccd));
-                                Vector2 xab, xabbc, xabbcbccd, xbccd, xcd;
-                                BezierBisect(oabbcbccd, obccd, ocd, od, out xab, out xabbc, out xabbcbccd, out xbccd, out xcd);
-                                polys.Add(new BezierPath(endZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-8-2", i), cssclass + " outline", xabbcbccd, xbccd, xcd, od));
-                                polys.Add(new BezierPath(endZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-4-2", i), cssclass + " outline link", oabbcbccd, xab, xabbc, xabbcbccd));
-                                polys.Add(new BezierPath(endZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-C-3", i), cssclass, oabbcbccd, obccd, ocd, od));
+                                startL.Add(new PathSegment(startZ, 0, order, String.Format("seg-0x{0:X4}-3-0", i), cssclass + " outline", oa, oab, oabbc, oabbcbccd));
+                                startL.Add(new PathSegment(startZ, 1, order, String.Format("seg-0x{0:X4}-3-1", i), cssclass, oa, oab, oabbc, oabbcbccd));
+                                endL.Add(new PathSegment(endZ, 0, order, String.Format("seg-0x{0:X4}-8-2", i), cssclass + " outline", od, null, null, null));
+                                endL.Add(new PathSegment(endZ, 0, order, String.Format("seg-0x{0:X4}-C-2", i), cssclass + " outline link", oabbcbccd, obccd, ocd, od));
+                                endL.Add(new PathSegment(endZ, 1, order, String.Format("seg-0x{0:X4}-C-3", i), cssclass, oabbcbccd, obccd, ocd, od));
                             }
                             else
                             {
-                                polys.Add(new BezierPath(endZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-C-0", i), cssclass + " outline", oabbcbccd, obccd, ocd, od));
-                                polys.Add(new BezierPath(endZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-C-1", i), cssclass, oabbcbccd, obccd, ocd, od));
-                                Vector2 xab, xabbc, xabbcbccd, xbccd, xcd;
-                                BezierBisect(oa, oab, oabbc, oabbcbccd, out xab, out xabbc, out xabbcbccd, out xbccd, out xcd);
-                                polys.Add(new BezierPath(startZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-1-2", i), cssclass + " outline", oa, xab, xabbc, xabbcbccd));
-                                polys.Add(new BezierPath(startZ, 0, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-2-2", i), cssclass + " outline link", xabbcbccd, xbccd, xcd, oabbcbccd));
-                                polys.Add(new BezierPath(startZ, 1, ns.Info.m_halfWidth, String.Format("seg-0x{0:X4}-3-3", i), cssclass, oa, oab, oabbc, oabbcbccd));
+                                endL.Add(new PathSegment(endZ, 0, order, String.Format("seg-0x{0:X4}-C-0", i), cssclass + " outline", oabbcbccd, obccd, ocd, od));
+                                endL.Add(new PathSegment(endZ, 1, order, String.Format("seg-0x{0:X4}-C-1", i), cssclass, oabbcbccd, obccd, ocd, od));
+                                startL.Add(new PathSegment(startZ, 0, order, String.Format("seg-0x{0:X4}-1-2", i), cssclass + " outline", oa, null, null, null));
+                                startL.Add(new PathSegment(startZ, 0, order, String.Format("seg-0x{0:X4}-3-2", i), cssclass + " outline link", oa, oab, oabbc, oabbcbccd));
+                                startL.Add(new PathSegment(startZ, 1, order, String.Format("seg-0x{0:X4}-3-3", i), cssclass, oa, oab, oabbc, oabbcbccd));
                             }
                         }
                     }
                 }
+                underground.Sort();
+                writer.WriteLine("<g id=\"underground\" style=\"opacity: 0.5;\">");
+                foreach (PathSegment e in underground)
+                {
+                    writer.Write("<path id=\"{0}\" d=\"", e.name);
+                    writePath(writer, e.P0, e.P1, e.P2, e.P3);
+                    writer.WriteLine("\" class=\"{0}\" />", e.cssclass);
+                }
+                writer.WriteLine("</g>");
                 polys.Sort();
-                foreach (BezierPath e in polys)
+                foreach (PathSegment e in polys)
                 {
                     writer.Write("<path id=\"{0}\" d=\"", e.name);
                     writePath(writer, e.P0, e.P1, e.P2, e.P3);

@@ -2527,6 +2527,7 @@ namespace KiwiManager
                 laneTitleStyle.normal.textColor = new Color(1f, 1f, 1f);
 
                 GUILayout.BeginVertical(laneStyle);
+//                GUILayout.Label("Lane " + (i + 1) + " mips: " + signStop.mipmapCount + " w:" + signStop.width, laneTitleStyle);
                 GUILayout.Label("Lane " + (i + 1), laneTitleStyle);
                     GUILayout.BeginVertical();
                         GUILayout.BeginHorizontal();
