@@ -226,7 +226,16 @@ namespace KiwiManager
         {
             var targetCar = vehicleList[targetCarID];
             var incomingCar = vehicleList[incomingCarID];
+            if (targetCar.fromSegment == incomingCar.fromSegment) return true;
+            sbyte aheadAngle = (sbyte) (getAngle(nodeID, targetCar.fromSegment) + 128);
+            sbyte targetToAngle = (sbyte) (getAngle(nodeID, targetCar.toSegment) - aheadAngle);
+            sbyte incomingFromAngle = (sbyte) (getAngle(nodeID, incomingCar.fromSegment) - aheadAngle);
+            sbyte incomingToAngle = (sbyte) (getAngle(nodeID, incomingCar.toSegment) - aheadAngle);
 
+            if (incomingFromAngle <= targetToAngle) return true;
+            if (incomingToAngle == targetToAngle) return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
+            return (incomingToAngle >= targetToAngle);
+/*
             if (isRightSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
             {
                 if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
@@ -267,14 +276,29 @@ namespace KiwiManager
             }
 
             return false;
+*/
         }
 
+        protected static sbyte getAngle(ushort nodeID, int segmentID)
+        {
+            Vector3 v = GetSegmentDir(segmentID, nodeID);
+            return (sbyte) Math.Round(Math.Atan2(v.x, v.z) * 128 / Math.PI);
+        }
         protected static bool _checkSameRoadIncomingCarRightHandDrive(ushort targetCarID, ushort incomingCarID,
             ushort nodeID)
         {
             var targetCar = vehicleList[targetCarID];
             var incomingCar = vehicleList[incomingCarID];
+            if (targetCar.fromSegment == incomingCar.fromSegment) return true;
+            sbyte aheadAngle = (sbyte) (getAngle(nodeID, targetCar.fromSegment) + 128);
+            sbyte targetToAngle = (sbyte) (getAngle(nodeID, targetCar.toSegment) - aheadAngle);
+            sbyte incomingFromAngle = (sbyte) (getAngle(nodeID, incomingCar.fromSegment) - aheadAngle);
+            sbyte incomingToAngle = (sbyte) (getAngle(nodeID, incomingCar.toSegment) - aheadAngle);
 
+            if (incomingFromAngle <= targetToAngle) return true;
+            if (incomingToAngle == targetToAngle) return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
+            return (incomingToAngle >= targetToAngle);
+/*
             if (isRightSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
             {
                 if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
@@ -312,6 +336,7 @@ namespace KiwiManager
             }
 
             return false;
+            */
         }
 
 
