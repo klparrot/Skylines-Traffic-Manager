@@ -2476,6 +2476,7 @@ namespace TrafficManager
             int num3 = 0;
 
             List<float[]> laneList = new List<float[]>();
+            List<uint> allLanes = new List<uint>();
 
             NetInfo.Direction dir = NetInfo.Direction.Forward;
             if (segment.m_startNode == TrafficLightTool.SelectedNode)
@@ -2489,6 +2490,7 @@ namespace TrafficManager
 
             while (num3 < info.m_lanes.Length && num2 != 0u)
             {
+                allLanes.Add(num2);
                 if (info.m_lanes[num3].m_laneType != NetInfo.LaneType.Pedestrian && info.m_lanes[num3].m_laneType != NetInfo.LaneType.Parking && info.m_lanes[num3].m_laneType != NetInfo.LaneType.None &&
                     info.m_lanes[num3].m_direction == dir3)
                 {
@@ -2613,17 +2615,69 @@ namespace TrafficManager
                     GUILayout.BeginVertical();
                         GUILayout.BeginHorizontal();
                         if (GUILayout.Button("←", ((flags & NetLane.Flags.Left) == NetLane.Flags.Left ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
+                        {
+                            laneFlag((uint)laneList[i][0], NetLane.Flags.Left);
+                            if (TrafficPriority.HasLeftSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                             {
-                                laneFlag((uint)laneList[i][0], NetLane.Flags.Left);
+                                NetLane.Flags flag;
+                                if ((segment.m_startNode == TrafficLightTool.SelectedNode) ^ (TrafficPriority.leftHandDrive))
+                                {
+                                    flag = NetLane.Flags.StartOneWayLeft;
+                                }
+                                else
+                                {
+                                    flag = NetLane.Flags.EndOneWayLeft;
+                                }
+                                if (TrafficPriority.hasLeftLane(TrafficLightTool.SelectedNode, _selectedSegmentIdx))
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags &= (ushort) ~flag;
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags |= (ushort) flag;
+                                    }
+                                }
                             }
+                        }
                         if (GUILayout.Button("↑", ((flags & NetLane.Flags.Forward) == NetLane.Flags.Forward ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(35) }))
-                            {
-                                laneFlag((uint)laneList[i][0], NetLane.Flags.Forward);
-                            }
+                        {
+                            laneFlag((uint)laneList[i][0], NetLane.Flags.Forward);
+                        }
                         if (GUILayout.Button("→", ((flags & NetLane.Flags.Right) == NetLane.Flags.Right ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
+                        {
+                            laneFlag((uint)laneList[i][0], NetLane.Flags.Right);
+                            if (TrafficPriority.HasRightSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                             {
-                                laneFlag((uint)laneList[i][0], NetLane.Flags.Right);
+                                NetLane.Flags flag;
+                                if ((segment.m_startNode == TrafficLightTool.SelectedNode) ^ (TrafficPriority.leftHandDrive))
+                                {
+                                    flag = NetLane.Flags.StartOneWayRight;
+                                }
+                                else
+                                {
+                                    flag = NetLane.Flags.EndOneWayRight;
+                                }
+                                if (TrafficPriority.hasRightLane(TrafficLightTool.SelectedNode, _selectedSegmentIdx))
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags &= (ushort) ~flag;
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags |= (ushort) flag;
+                                    }
+                                }
                             }
+                        }
                         GUILayout.EndHorizontal();
                     GUILayout.EndVertical();
                 GUILayout.EndVertical();

@@ -659,7 +659,7 @@ namespace TrafficManager
             {
                 var flags = (NetLane.Flags)Singleton<NetManager>.instance.m_lanes.m_buffer[(int)num2].m_flags;
 
-                if (info.m_lanes[num3].m_direction == dir3 && (flags & NetLane.Flags.Left) != NetLane.Flags.None)
+                if (info.m_lanes[num3].m_direction == dir3 && (flags & NetLane.Flags.Left) == NetLane.Flags.Left)
                 {
                     return true;
                 }
@@ -692,7 +692,7 @@ namespace TrafficManager
             {
                 var flags = (NetLane.Flags)Singleton<NetManager>.instance.m_lanes.m_buffer[(int)num2].m_flags;
 
-                if (info.m_lanes[num3].m_direction == dir3 && (flags & NetLane.Flags.Left) != NetLane.Flags.Forward)
+                if (info.m_lanes[num3].m_direction == dir3 && (flags & NetLane.Flags.Forward) == NetLane.Flags.Forward)
                 {
                     return true;
                 }
@@ -725,7 +725,7 @@ namespace TrafficManager
             {
                 var flags = (NetLane.Flags)Singleton<NetManager>.instance.m_lanes.m_buffer[(int)num2].m_flags;
 
-                if (info.m_lanes[num3].m_direction == dir3 && (flags & NetLane.Flags.Left) != NetLane.Flags.Right)
+                if (info.m_lanes[num3].m_direction == dir3 && (flags & NetLane.Flags.Right) == NetLane.Flags.Right)
                 {
                     return true;
                 }
