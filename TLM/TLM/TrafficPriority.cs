@@ -227,14 +227,32 @@ namespace KiwiManager
             var targetCar = vehicleList[targetCarID];
             var incomingCar = vehicleList[incomingCarID];
             if (targetCar.fromSegment == incomingCar.fromSegment) return true;
+            if (isForwardSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && !isForwardSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) return true;
             sbyte aheadAngle = (sbyte) (getAngle(nodeID, targetCar.fromSegment) + 128);
-            sbyte targetToAngle = (sbyte) (getAngle(nodeID, targetCar.toSegment) - aheadAngle);
-            sbyte incomingFromAngle = (sbyte) (getAngle(nodeID, incomingCar.fromSegment) - aheadAngle);
-            sbyte incomingToAngle = (sbyte) (getAngle(nodeID, incomingCar.toSegment) - aheadAngle);
+            sbyte targetToAngle = (sbyte) -(getAngle(nodeID, targetCar.toSegment) - aheadAngle);
+            sbyte incomingFromAngle = (sbyte) -(getAngle(nodeID, incomingCar.fromSegment) - aheadAngle);
+            sbyte incomingToAngle = (sbyte) -(getAngle(nodeID, incomingCar.toSegment) - aheadAngle);
+            if (incomingFromAngle <= targetToAngle)
+            {
+                if (incomingToAngle < targetToAngle || (incomingToAngle == targetToAngle &&
+                    laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID)))
+                {
+                    return true; // no conflict
+                }
+            }
+            else
+            {
+                if (incomingToAngle > targetToAngle || (incomingToAngle == targetToAngle &&
+                    laneOrderCorrect(targetCar.toSegment, incomingCar.toLaneID, targetCar.toLaneID)))
+                {
+                    return true; // no conflict
+                }
+            }
+            if (!isForwardSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && isForwardSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) return false;
 
-            if (incomingFromAngle <= targetToAngle) return true;
-            if (incomingToAngle == targetToAngle) return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-            return (incomingToAngle >= targetToAngle);
+            targetToAngle = (sbyte) -targetToAngle;
+            incomingFromAngle = (sbyte) -incomingFromAngle;
+            return (incomingFromAngle < targetToAngle);
 /*
             if (isRightSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
             {
@@ -340,148 +358,6 @@ namespace KiwiManager
         }
 
 
-        public static bool checkPriorityRoadIncomingCar(ushort targetCarID, ushort incomingCarID, ushort nodeID)
-        {
-            if (leftHandDrive)
-            {
-                return _checkPriorityRoadIncomingCarLeftHandDrive(targetCarID, incomingCarID, nodeID);
-            }
-            else
-            {
-                return _checkPriorityRoadIncomingCarRightHandDrive(targetCarID, incomingCarID, nodeID);
-            }
-        }
-
-        protected static bool _checkPriorityRoadIncomingCarLeftHandDrive(ushort targetCarID, ushort incomingCarID,
-            ushort nodeID)
-        {
-            var targetCar = vehicleList[targetCarID];
-            var incomingCar = vehicleList[incomingCarID];
-
-            if (incomingCar.toSegment == targetCar.toSegment)
-            {
-                if (incomingCar.toLaneID != targetCar.toLaneID)
-                {
-                    if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                    // target car goes right
-                    {
-                        // go if incoming car is in the left lane
-                        return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                    }
-                    else if (isLeftSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                    // target car goes left
-                    {
-                        // go if incoming car is in the right lane
-                        return laneOrderCorrect(targetCar.toSegment, incomingCar.toLaneID, targetCar.toLaneID);
-                    }
-                    else // target car goes straight (or other road)
-                    {
-                        if (isRightSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // incoming car goes right
-                        {
-                            // go if incoming car is in the left lane
-                            return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, targetCar.toLaneID);
-                        }
-                        else if (isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // incoming car goes left
-                        {
-                            // go if incoming car is in the right lane
-                            return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID,
-                                incomingCar.toLaneID);
-                        }
-                    }
-                }
-            }
-            else if (incomingCar.toSegment == targetCar.fromSegment)
-            {
-                if (isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID))
-                {
-                    return true;
-                }
-                else if (targetCar.toSegment == incomingCar.fromSegment)
-                {
-                    return true;
-                }
-            }
-            else // if no segment match
-            {
-                // target car turning right
-                if (isLeftSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                {
-                    return true;
-                }
-                else if (isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // incoming car turning right
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        protected static bool _checkPriorityRoadIncomingCarRightHandDrive(ushort targetCarID, ushort incomingCarID,
-            ushort nodeID)
-        {
-            var targetCar = vehicleList[targetCarID];
-            var incomingCar = vehicleList[incomingCarID];
-
-            if (incomingCar.toSegment == targetCar.toSegment)
-            {
-                if (incomingCar.toLaneID != targetCar.toLaneID)
-                {
-                    if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                    // target car goes right
-                    {
-                        // go if incoming car is in the left lane
-                        return laneOrderCorrect(targetCar.toSegment, incomingCar.toLaneID, targetCar.toLaneID);
-                    }
-                    else if (isLeftSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                    // target car goes left
-                    {
-                        // go if incoming car is in the right lane
-                        return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                    }
-                    else // target car goes straight (or other road)
-                    {
-                        if (isRightSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // incoming car goes right
-                        {
-                            // go if incoming car is in the left lane
-                            return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                        }
-                        else if (isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // incoming car goes left
-                        {
-                            // go if incoming car is in the right lane
-                            return laneOrderCorrect(targetCar.toSegment, incomingCar.toLaneID,
-                                targetCar.toLaneID);
-                        }
-                    }
-                }
-            }
-            else if (incomingCar.toSegment == targetCar.fromSegment)
-            {
-                if (isRightSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID))
-                {
-                    return true;
-                }
-                else if (targetCar.toSegment == incomingCar.fromSegment)
-                {
-                    return true;
-                }
-            }
-            else // if no segment match
-            {
-                // target car turning right
-                if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                {
-                    return true;
-                }
-                else if (isRightSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // incoming car turning right
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public static bool laneOrderCorrect(int segmentid, uint leftLane, uint rightLane)
         {
             NetManager instance = Singleton<NetManager>.instance;
@@ -558,6 +434,17 @@ namespace KiwiManager
             toDir.y = 0;
             toDir.Normalize();
             return Vector3.Cross(fromDir, toDir).y >= 0.5;
+        }
+
+        public static bool isForwardSegment(int fromSegment, int toSegment, ushort nodeid)
+        {
+            Vector3 fromDir = GetSegmentDir(fromSegment, nodeid);
+            fromDir.y = 0;
+            fromDir.Normalize();
+            Vector3 toDir = GetSegmentDir(toSegment, nodeid);
+            toDir.y = 0;
+            toDir.Normalize();
+            return Math.Abs(Vector3.Cross(fromDir, toDir).y) < 0.5;
         }
 
         public static bool HasLeftSegment(int segmentID, ushort nodeID, bool debug = false)
