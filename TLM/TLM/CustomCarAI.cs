@@ -15,7 +15,7 @@ namespace KiwiManager
             {
                 PathManager instance = Singleton<PathManager>.instance;
                 byte pathFindFlags = instance.m_pathUnits.m_buffer[(int) ((UIntPtr) data.m_path)].m_pathFindFlags;
-                if ((pathFindFlags & 4) != 0)
+                if ((pathFindFlags & PathUnit.FLAG_READY) != 0)
                 {
                     data.m_pathPositionIndex = 255;
                     data.m_flags &= ~Vehicle.Flags.WaitingPath;
@@ -23,7 +23,7 @@ namespace KiwiManager
                     this.PathfindSuccess(vehicleID, ref data);
                     this.TrySpawn(vehicleID, ref data);
                 }
-                else if ((pathFindFlags & 8) != 0)
+                else if ((pathFindFlags & PathUnit.FLAG_FAILED) != 0)
                 {
                     data.m_flags &= ~Vehicle.Flags.WaitingPath;
                     Singleton<PathManager>.instance.ReleasePath(data.m_path);
@@ -112,13 +112,13 @@ namespace KiwiManager
                 ushort num3;
                 if (offset < position.m_offset)
                 {
-                    segment.b = pos + dir.normalized*this.m_info.m_generatedInfo.m_size.z;
+                    segment.b = pos + dir.normalized * this.m_info.m_generatedInfo.m_size.z;
                     num2 = instance.m_segments.m_buffer[(int) position.m_segment].m_startNode;
                     num3 = instance.m_segments.m_buffer[(int) position.m_segment].m_endNode;
                 }
                 else
                 {
-                    segment.b = pos - dir.normalized*this.m_info.m_generatedInfo.m_size.z;
+                    segment.b = pos - dir.normalized * this.m_info.m_generatedInfo.m_size.z;
                     num2 = instance.m_segments.m_buffer[(int) position.m_segment].m_endNode;
                     num3 = instance.m_segments.m_buffer[(int) position.m_segment].m_startNode;
                 }
@@ -138,13 +138,10 @@ namespace KiwiManager
                     uint num5 = (uint)(((int)num4 << 8) / 32768);
                     uint num6 = currentFrameIndex - num5 & 255u;
 
-                    NetNode.Flags flags = instance.m_nodes.m_buffer[(int) num2].m_flags;
-                    NetLane.Flags flags2 =
+                    NetNode.Flags flagsNode = instance.m_nodes.m_buffer[(int) num2].m_flags;
+                    NetLane.Flags flagsLane =
                         (NetLane.Flags) instance.m_lanes.m_buffer[(int) ((UIntPtr) prevLaneID)].m_flags;
-                    bool flag = (flags & NetNode.Flags.TrafficLights) != NetNode.Flags.None;
-                    bool flag2 = (flags & NetNode.Flags.LevelCrossing) != NetNode.Flags.None;
-                    bool flag3 = (flags2 & NetLane.Flags.JoinedJunction) != NetLane.Flags.None;
-                    if ((flags & (NetNode.Flags.Junction | NetNode.Flags.OneWayOut | NetNode.Flags.OneWayIn)) ==
+                    if ((flagsNode & (NetNode.Flags.Junction | NetNode.Flags.OneWayOut | NetNode.Flags.OneWayIn)) ==
                         NetNode.Flags.Junction && instance.m_nodes.m_buffer[(int) num2].CountSegments() != 2)
                     {
                         float len = vehicleData.CalculateTotalLength(vehicleID) + 2f;
@@ -220,28 +217,30 @@ namespace KiwiManager
                             vehicleData.GetLastFrameData().m_velocity.sqrMagnitude;
                     }
 
-                    if (flag && (!flag3 || flag2))
+                    if ((flagsNode & NetNode.Flags.TrafficLights) != 0 &&
+                        ((flagsLane & NetLane.Flags.JoinedJunction) == 0 ||
+                        (flagsNode & NetNode.Flags.LevelCrossing) != 0))
                     {
                         var nodeSimulation = CustomRoadAI.GetNodeSimulation(num4);
 
                         NetInfo info = instance.m_nodes.m_buffer[(int) num2].Info;
                         RoadBaseAI.TrafficLightState vehicleLightState;
                         RoadBaseAI.TrafficLightState pedestrianLightState;
-                        bool flag5;
                         bool pedestrians;
 
                         if (nodeSimulation == null || (nodeSimulation.FlagTimedTrafficLights && !nodeSimulation.TimedTrafficLightsActive))
                         {
+                            bool vehicles;
                             RoadBaseAI.GetTrafficLightState(num4,
                                 ref instance.m_segments.m_buffer[(int) prevPos.m_segment],
-                                currentFrameIndex - num5, out vehicleLightState, out pedestrianLightState, out flag5,
+                                currentFrameIndex - num5, out vehicleLightState, out pedestrianLightState, out vehicles,
                                 out pedestrians);
-                            if (!flag5 && num6 >= 196u)
+                            if (!vehicles && num6 >= 196u)
                             {
-                                flag5 = true;
+                                vehicles = true;
                                 RoadBaseAI.SetTrafficLightState(num4,
                                     ref instance.m_segments.m_buffer[(int) prevPos.m_segment], currentFrameIndex - num5,
-                                    vehicleLightState, pedestrianLightState, flag5, pedestrians);
+                                    vehicleLightState, pedestrianLightState, vehicles, pedestrians);
                             }
 
                             if ((vehicleData.m_flags & Vehicle.Flags.Emergency2) == Vehicle.Flags.None ||
