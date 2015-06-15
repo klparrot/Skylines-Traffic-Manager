@@ -144,6 +144,32 @@ namespace KiwiManager
 
                         if ((node.m_flags & NetNode.Flags.TrafficLights) == NetNode.Flags.None)
                         {
+                            if (fromPrioritySegment.ComparablePriority <= prioritySegment.ComparablePriority)
+                            {
+                                numCars += prioritySegment.cars.Count;
+                                if (fromPrioritySegment.ComparablePriority < prioritySegment.ComparablePriority)
+                                {
+                                    foreach (ushort car in prioritySegment.cars)
+                                    {
+                                        if (checkSameRoadIncomingCar(targetCar, car, nodeID, true))
+                                        {
+                                            numCars--;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (ushort car in prioritySegment.cars)
+                                    {
+                                        if (vehicleList[car].lastSpeed <= 0.1f || checkSameRoadIncomingCar(targetCar, car, nodeID))
+                                        {
+                                            numCars--;
+                                        }
+                                    }
+                                }
+
+                            }
+                            /*
                             if (fromPrioritySegment.type == PrioritySegment.PriorityType.Main)
                             {
                                 if (prioritySegment.type == PrioritySegment.PriorityType.Main)
@@ -181,6 +207,7 @@ namespace KiwiManager
                                     }
                                 }
                             }
+                            */
                         }
                         else
                         {
@@ -209,11 +236,11 @@ namespace KiwiManager
             return (numCars > 0);
         }
 
-        public static bool checkSameRoadIncomingCar(ushort targetCarID, ushort incomingCarID, ushort nodeID)
+        public static bool checkSameRoadIncomingCar(ushort targetCarID, ushort incomingCarID, ushort nodeID, bool giveway = false)
         {
             if (leftHandDrive)
             {
-                return _checkSameRoadIncomingCarLeftHandDrive(targetCarID, incomingCarID, nodeID);
+                return _checkSameRoadIncomingCarLeftHandDrive(targetCarID, incomingCarID, nodeID, giveway);
             }
             else
             {
@@ -222,12 +249,12 @@ namespace KiwiManager
         }
 
         protected static bool _checkSameRoadIncomingCarLeftHandDrive(ushort targetCarID, ushort incomingCarID,
-            ushort nodeID)
+            ushort nodeID, bool giveway = false)
         {
             var targetCar = vehicleList[targetCarID];
             var incomingCar = vehicleList[incomingCarID];
             if (targetCar.fromSegment == incomingCar.fromSegment) return true;
-            if (isForwardSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && !isForwardSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) return true;
+            if (!giveway && isForwardSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && !isForwardSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) return true;
             sbyte aheadAngle = (sbyte) (getAngle(nodeID, targetCar.fromSegment) + 128);
             sbyte targetToAngle = (sbyte) -(getAngle(nodeID, targetCar.toSegment) - aheadAngle);
             sbyte incomingFromAngle = (sbyte) -(getAngle(nodeID, incomingCar.fromSegment) - aheadAngle);
@@ -248,53 +275,12 @@ namespace KiwiManager
                     return true; // no conflict
                 }
             }
+            if (giveway) return false;
             if (!isForwardSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && isForwardSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) return false;
 
             targetToAngle = (sbyte) -targetToAngle;
             incomingFromAngle = (sbyte) -incomingFromAngle;
             return (incomingFromAngle < targetToAngle);
-/*
-            if (isRightSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
-            {
-                if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                {
-                    if (isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID))
-                    {
-                        return true;
-                    }
-                }
-                else if (targetCar.toSegment == incomingCar.toSegment && targetCar.toLaneID != incomingCar.toLaneID)
-                {
-                    return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                }
-            }
-            else if (isLeftSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
-                // incoming is on the left
-            {
-                return true;
-            }
-            else // incoming is in front or elsewhere
-            {
-                if (!isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                    // target car not going left
-                {
-                    return true;
-                }
-                else if (isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID))
-                {
-                    if (targetCar.toLaneID != incomingCar.toLaneID)
-                    {
-                        return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                    }
-                }
-                else if (isLeftSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // both left turns
-                {
-                    return true;
-                }
-            }
-
-            return false;
-*/
         }
 
         protected static sbyte getAngle(ushort nodeID, int segmentID)
@@ -316,45 +302,6 @@ namespace KiwiManager
             if (incomingFromAngle <= targetToAngle) return true;
             if (incomingToAngle == targetToAngle) return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
             return (incomingToAngle >= targetToAngle);
-/*
-            if (isRightSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
-            {
-                if (isRightSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                {
-                    return true;
-                }
-                else if (targetCar.toSegment == incomingCar.toSegment && targetCar.toLaneID != incomingCar.toLaneID)
-                {
-                    return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                }
-            }
-            else if (isLeftSegment(targetCar.fromSegment, incomingCar.fromSegment, nodeID))
-                // incoming is on the left
-            {
-                return true;
-            }
-            else // incoming is in front or elsewhere
-            {
-                if (!isLeftSegment(targetCar.fromSegment, targetCar.toSegment, nodeID))
-                    // target car not going left
-                {
-                    return true;
-                }
-                else if (isRightSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID))
-                {
-                    if (targetCar.toLaneID != incomingCar.toLaneID)
-                    {
-                        return laneOrderCorrect(targetCar.toSegment, targetCar.toLaneID, incomingCar.toLaneID);
-                    }
-                }
-                else if (isLeftSegment(targetCar.fromSegment, targetCar.toSegment, nodeID) && isLeftSegment(incomingCar.fromSegment, incomingCar.toSegment, nodeID)) // both left turns
-                {
-                    return true;
-                }
-            }
-
-            return false;
-            */
         }
 
 

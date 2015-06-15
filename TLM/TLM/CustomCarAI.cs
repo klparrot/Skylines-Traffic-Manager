@@ -226,11 +226,11 @@ namespace KiwiManager
                         NetInfo info = instance.m_nodes.m_buffer[(int) num2].Info;
                         RoadBaseAI.TrafficLightState vehicleLightState;
                         RoadBaseAI.TrafficLightState pedestrianLightState;
-                        bool pedestrians;
 
                         if (nodeSimulation == null || (nodeSimulation.FlagTimedTrafficLights && !nodeSimulation.TimedTrafficLightsActive))
                         {
                             bool vehicles;
+                            bool pedestrians;
                             RoadBaseAI.GetTrafficLightState(num4,
                                 ref instance.m_segments.m_buffer[(int) prevPos.m_segment],
                                 currentFrameIndex - num5, out vehicleLightState, out pedestrianLightState, out vehicles,
