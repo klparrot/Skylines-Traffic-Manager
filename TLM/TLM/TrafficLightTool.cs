@@ -2460,6 +2460,38 @@ namespace KiwiManager
             }
         }
 
+        internal struct OrderedLane : IComparable<OrderedLane>
+        {
+            public uint laneid; // index in NetManager.m_lanes.m_buffer
+            public float position; // offset from centerline
+            public uint index; // index in NetInfo.m_lanes
+            public OrderedLane(uint laneid, float position, uint index, NetInfo.Direction dir = NetInfo.Direction.Forward)
+            {
+                this.laneid = laneid;
+                this.position = position;
+                this.index = index;
+                if ((dir & NetInfo.Direction.Backward) != 0)
+                {
+                    this.position = -position;
+                }
+            }
+            public int CompareTo(OrderedLane other)
+            {
+                if (this.position != other.position)
+                {
+                    return this.position.CompareTo(other.position);
+                }
+                else if (this.index != other.index)
+                {
+                    return this.index.CompareTo(other.index);
+                }
+                else
+                {
+                    return this.laneid.CompareTo(other.laneid);
+                }
+            }
+        }
+
         protected void _guiLaneChangeWindow(int num)
         {
             NetManager instance = Singleton<NetManager>.instance;
@@ -2469,9 +2501,9 @@ namespace KiwiManager
             var info = segment.Info;
 
             uint num2 = segment.m_lanes;
-            int num3 = 0;
+            uint num3 = 0;
 
-            List<float[]> laneList = new List<float[]>();
+            List<OrderedLane> laneList = new List<OrderedLane>();
             List<uint> allLanes = new List<uint>();
 
             NetInfo.Direction dir = NetInfo.Direction.Forward;
@@ -2480,29 +2512,19 @@ namespace KiwiManager
             var dir2 = ((segment.m_flags & NetSegment.Flags.Invert) == NetSegment.Flags.None) ? dir : NetInfo.InvertDirection(dir);
             var dir3 = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir2) : dir2;
 
-            var numLanes = 0;
-
             while (num3 < info.m_lanes.Length && num2 != 0u)
             {
                 allLanes.Add(num2);
                 if ((info.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && info.m_lanes[num3].m_direction == dir3)
                 {
-                    laneList.Add(new float[3] { num2, info.m_lanes[num3].m_position, num3 });
-                    numLanes++;
+                    laneList.Add(new OrderedLane(num2, info.m_lanes[num3].m_position, num3, dir2));
                 }
 
                 num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
                 num3++;
             }
 
-            if (dir2 == NetInfo.Direction.Forward)
-            {
-                laneList.Sort((float[] x, float[] y) => x[1].CompareTo(y[1]));
-            }
-            else
-            {
-                laneList.Sort((float[] x, float[] y) => (-x[1]).CompareTo((-y[1])));
-            }
+            laneList.Sort();
 
             GUILayout.BeginHorizontal();
 
@@ -2511,7 +2533,7 @@ namespace KiwiManager
 
             for (var i = 0; i < laneList.Count; i++)
             {
-                var flags = (NetLane.Flags) Singleton<NetManager>.instance.m_lanes.m_buffer[(int)laneList[i][0]].m_flags;
+                var flags = (NetLane.Flags) Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_flags;
 
                 var style1 = new GUIStyle("button");
                 var style2 = new GUIStyle("button");
@@ -2533,7 +2555,7 @@ namespace KiwiManager
                         GUILayout.BeginHorizontal();
                         if (GUILayout.Button("←", ((flags & NetLane.Flags.Left) == NetLane.Flags.Left ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
                         {
-                            laneFlag((uint)laneList[i][0], NetLane.Flags.Left);
+                            laneFlag(laneList[i].laneid, NetLane.Flags.Left);
                             if (TrafficPriority.HasLeftSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                             {
                                 NetLane.Flags flag;
@@ -2563,11 +2585,11 @@ namespace KiwiManager
                         }
                         if (GUILayout.Button("↑", ((flags & NetLane.Flags.Forward) == NetLane.Flags.Forward ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(35) }))
                         {
-                            laneFlag((uint)laneList[i][0], NetLane.Flags.Forward);
+                            laneFlag(laneList[i].laneid, NetLane.Flags.Forward);
                         }
                         if (GUILayout.Button("→", ((flags & NetLane.Flags.Right) == NetLane.Flags.Right ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
                         {
-                            laneFlag((uint)laneList[i][0], NetLane.Flags.Right);
+                            laneFlag(laneList[i].laneid, NetLane.Flags.Right);
                             if (TrafficPriority.HasRightSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                             {
                                 NetLane.Flags flag;
@@ -2617,7 +2639,7 @@ namespace KiwiManager
             var info2 = segment2.Info;
 
             uint num2 = segment2.m_lanes;
-            int num3 = 0;
+            uint num3 = 0;
 
             var numLanes = 0;
 
@@ -2762,18 +2784,15 @@ namespace KiwiManager
             var info2 = segment2.Info;
 
             uint num2 = segment2.m_lanes;
-            int num3 = 0;
+            uint num3 = 0;
 
             List<float[]> laneList = new List<float[]>();
-
-            var numLanes = 0;
 
             while (num3 < info2.m_lanes.Length && num2 != 0u)
             {
                 if ((info2.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0)
                 {
                     laneList.Add(new float[3] {num2, info2.m_lanes[num3].m_position, num3});
-                    numLanes++;
                 }
 
                 num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
