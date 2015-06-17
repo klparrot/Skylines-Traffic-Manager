@@ -2496,55 +2496,48 @@ namespace KiwiManager
         {
             NetManager instance = Singleton<NetManager>.instance;
 
-            var segment = instance.m_segments.m_buffer[_selectedSegmentIdx];
+            NetSegment segment = instance.m_segments.m_buffer[_selectedSegmentIdx];
 
-            var info = segment.Info;
-
-            uint num2 = segment.m_lanes;
-            uint num3 = 0;
+            NetInfo info = segment.Info;
 
             List<OrderedLane> laneList = new List<OrderedLane>();
             List<uint> allLanes = new List<uint>();
 
-            NetInfo.Direction dir = NetInfo.Direction.Forward;
-            if (segment.m_startNode == TrafficLightTool.SelectedNode)
-                dir = NetInfo.Direction.Backward;
-            var dir2 = ((segment.m_flags & NetSegment.Flags.Invert) == NetSegment.Flags.None) ? dir : NetInfo.InvertDirection(dir);
-            var dir3 = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir2) : dir2;
+            NetInfo.Direction dir = segment.m_endNode == TrafficLightTool.SelectedNode ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+            if ((segment.m_flags & NetSegment.Flags.Invert) != 0) dir = NetInfo.InvertDirection(dir);
+            NetInfo.Direction dir3 = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir) : dir;
 
-            while (num3 < info.m_lanes.Length && num2 != 0u)
+            uint num2 = segment.m_lanes;
+
+            for (uint num3 = 0; num3 < info.m_lanes.Length && num2 != 0; ++num3)
             {
                 allLanes.Add(num2);
                 if ((info.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && info.m_lanes[num3].m_direction == dir3)
                 {
-                    laneList.Add(new OrderedLane(num2, info.m_lanes[num3].m_position, num3, dir2));
+                    laneList.Add(new OrderedLane(num2, info.m_lanes[num3].m_position, num3, dir));
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
-                num3++;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
             }
 
             laneList.Sort();
 
             GUILayout.BeginHorizontal();
 
-            var boxstyle = new GUIStyle();
-            boxstyle.fixedWidth = 69;
-
-            for (var i = 0; i < laneList.Count; i++)
+            for (int i = 0; i < laneList.Count; i++)
             {
-                var flags = (NetLane.Flags) Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_flags;
+                NetLane.Flags flags = (NetLane.Flags) Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_flags;
 
-                var style1 = new GUIStyle("button");
-                var style2 = new GUIStyle("button");
+                GUIStyle style1 = new GUIStyle("button");
+                GUIStyle style2 = new GUIStyle("button");
                 style2.normal.textColor = new Color32(255, 0, 0, 255);
                 style2.hover.textColor = new Color32(255, 0, 0, 255);
                 style2.focused.textColor = new Color32(255, 0, 0, 255);
 
-                var laneStyle = new GUIStyle();
+                GUIStyle laneStyle = new GUIStyle();
                 laneStyle.contentOffset = new Vector2(12f, 0f);
 
-                var laneTitleStyle = new GUIStyle();
+                GUIStyle laneTitleStyle = new GUIStyle();
                 laneTitleStyle.contentOffset = new Vector2(36f, 2f);
                 laneTitleStyle.normal.textColor = new Color(1f, 1f, 1f);
 
@@ -2553,11 +2546,11 @@ namespace KiwiManager
                 GUILayout.Label("Lane " + (i + 1), laneTitleStyle);
                     GUILayout.BeginVertical();
                         GUILayout.BeginHorizontal();
-                        if (GUILayout.Button("←", ((flags & NetLane.Flags.Left) == NetLane.Flags.Left ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
+                        if (TrafficPriority.HasLeftSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                         {
-                            laneFlag(laneList[i].laneid, NetLane.Flags.Left);
-                            if (TrafficPriority.HasLeftSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
+                            if (GUILayout.Button("←", ((flags & NetLane.Flags.Left) == NetLane.Flags.Left ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
                             {
+                                laneFlag(laneList[i].laneid, NetLane.Flags.Left);
                                 NetLane.Flags flag;
                                 if ((segment.m_startNode == TrafficLightTool.SelectedNode) ^ (TrafficPriority.leftHandDrive))
                                 {
@@ -2583,15 +2576,18 @@ namespace KiwiManager
                                 }
                             }
                         }
-                        if (GUILayout.Button("↑", ((flags & NetLane.Flags.Forward) == NetLane.Flags.Forward ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(35) }))
+                        if (TrafficPriority.HasForwardSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                         {
-                            laneFlag(laneList[i].laneid, NetLane.Flags.Forward);
-                        }
-                        if (GUILayout.Button("→", ((flags & NetLane.Flags.Right) == NetLane.Flags.Right ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
-                        {
-                            laneFlag(laneList[i].laneid, NetLane.Flags.Right);
-                            if (TrafficPriority.HasRightSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
+                            if (GUILayout.Button("↑", ((flags & NetLane.Flags.Forward) == NetLane.Flags.Forward ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(35) }))
                             {
+                                laneFlag(laneList[i].laneid, NetLane.Flags.Forward);
+                            }
+                        }
+                        if (TrafficPriority.HasRightSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
+                        {
+                            if (GUILayout.Button("→", ((flags & NetLane.Flags.Right) == NetLane.Flags.Right ? style1 : style2), new GUILayoutOption[2] { GUILayout.Width(35), GUILayout.Height(25) }))
+                            {
+                                laneFlag(laneList[i].laneid, NetLane.Flags.Right);
                                 NetLane.Flags flag;
                                 if ((segment.m_startNode == TrafficLightTool.SelectedNode) ^ (TrafficPriority.leftHandDrive))
                                 {
