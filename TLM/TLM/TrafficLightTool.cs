@@ -2470,8 +2470,6 @@ namespace TrafficManager
 
             var numLanes = 0;
 
-            var maxValue = 0f;
-
             while (num3 < info.m_lanes.Length && num2 != 0u)
             {
                 allLanes.Add(num2);
@@ -2480,7 +2478,6 @@ namespace TrafficManager
                 {
                     laneList.Add(new float[3] { num2, info.m_lanes[num3].m_position, num3 });
                     numLanes++;
-                    maxValue = Mathf.Max(maxValue, info.m_lanes[num3].m_position);
                 }
 
                 num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
@@ -2523,7 +2520,7 @@ namespace TrafficManager
                     {
                         if (dir3 == NetInfo.Direction.Forward)
                         {
-                            if (y[1] + maxValue > x[1] + maxValue)
+                            if (y[1] > x[1])
                             {
                                 return -1;
                             }
@@ -2534,7 +2531,7 @@ namespace TrafficManager
                         }
                         else
                         {
-                            if (x[1] + maxValue > y[1] + maxValue)
+                            if (x[1] > y[1])
                             {
                                 return -1;
                             }
@@ -2548,7 +2545,7 @@ namespace TrafficManager
                     {
                         if (dir3 == NetInfo.Direction.Forward)
                         {
-                            if (x[1] + maxValue > y[1] + maxValue)
+                            if (x[1] > y[1])
                             {
                                 return -1;
                             }
@@ -2559,7 +2556,7 @@ namespace TrafficManager
                         }
                         else
                         {
-                            if (y[1] + maxValue > x[1] + maxValue)
+                            if (y[1] > x[1])
                             {
                                 return -1;
                             }
@@ -2752,7 +2749,6 @@ namespace TrafficManager
                         var restSegment = TrafficRoadRestrictions.getSegment(SelectedSegmentIndexes[i]);
 
                         List<float[]> laneList0 = new List<float[]>();
-                        var maxValue0 = 0f;
 
                         while (num30 < info0.m_lanes.Length && num20 != 0u)
                         {
@@ -2761,7 +2757,6 @@ namespace TrafficManager
                                 info0.m_lanes[num30].m_laneType != NetInfo.LaneType.None)
                             {
                                 laneList0.Add(new float[3] { num20, info0.m_lanes[num30].m_position, num30});
-                                maxValue0 = Mathf.Max(maxValue0, info0.m_lanes[num30].m_position);
                             }
 
                             num20 = instance0.m_lanes.m_buffer[(int)((UIntPtr)num20)].m_nextLane;
@@ -2784,7 +2779,7 @@ namespace TrafficManager
                         {
                             laneList0.Sort(delegate(float[] x, float[] y)
                             {
-                                if (x[1] + maxValue0 > y[1] + maxValue0)
+                                if (x[1] > y[1])
                                 {
                                     return -1;
                                 }
@@ -2857,8 +2852,6 @@ namespace TrafficManager
 
             var numLanes = 0;
 
-            var maxValue = 0f;
-
             while (num3 < info2.m_lanes.Length && num2 != 0u)
             {
                 if (info2.m_lanes[num3].m_laneType != NetInfo.LaneType.Pedestrian &&
@@ -2867,7 +2860,6 @@ namespace TrafficManager
                 {
                     laneList.Add(new float[3] {num2, info2.m_lanes[num3].m_position, num3});
                     numLanes++;
-                    maxValue = Mathf.Max(maxValue, info2.m_lanes[num3].m_position);
                 }
 
                 num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
@@ -2890,7 +2882,7 @@ namespace TrafficManager
             {
                 laneList.Sort(delegate(float[] x, float[] y)
                 {
-                    if (x[1] + maxValue > y[1] + maxValue)
+                    if (x[1] > y[1])
                     {
                         return -1;
                     }
