@@ -2473,8 +2473,7 @@ namespace TrafficManager
             while (num3 < info.m_lanes.Length && num2 != 0u)
             {
                 allLanes.Add(num2);
-                if (info.m_lanes[num3].m_laneType != NetInfo.LaneType.Pedestrian && info.m_lanes[num3].m_laneType != NetInfo.LaneType.Parking && info.m_lanes[num3].m_laneType != NetInfo.LaneType.None &&
-                    info.m_lanes[num3].m_direction == dir3)
+                if ((info.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && info.m_lanes[num3].m_direction == dir3)
                 {
                     laneList.Add(new float[3] { num2, info.m_lanes[num3].m_position, num3 });
                     numLanes++;
@@ -2484,89 +2483,13 @@ namespace TrafficManager
                 num3++;
             }
 
-            if (!TrafficLightsManual.segmentIsOneWay(_selectedSegmentIdx))
+            if (dir2 == NetInfo.Direction.Forward)
             {
-                laneList.Sort(delegate(float[] x, float[] y)
-                {
-                    if (!TrafficPriority.leftHandDrive)
-                    {
-                        if (Mathf.Abs(y[1]) > Mathf.Abs(x[1]))
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    }
-                    else
-                    {
-                        if (Mathf.Abs(x[1]) > Mathf.Abs(y[1]))
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    }
-                });
+                laneList.Sort((float[] x, float[] y) => x[1].CompareTo(y[1]));
             }
             else
             {
-                laneList.Sort(delegate(float[] x, float[] y)
-                {
-                    if (!TrafficPriority.leftHandDrive)
-                    {
-                        if (dir3 == NetInfo.Direction.Forward)
-                        {
-                            if (y[1] > x[1])
-                            {
-                                return -1;
-                            }
-                            else
-                            {
-                                return 1;
-                            }
-                        }
-                        else
-                        {
-                            if (x[1] > y[1])
-                            {
-                                return -1;
-                            }
-                            else
-                            {
-                                return 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (dir3 == NetInfo.Direction.Forward)
-                        {
-                            if (x[1] > y[1])
-                            {
-                                return -1;
-                            }
-                            else
-                            {
-                                return 1;
-                            }
-                        }
-                        else
-                        {
-                            if (y[1] > x[1])
-                            {
-                                return -1;
-                            }
-                            else
-                            {
-                                return 1;
-                            }
-                        }
-                    }
-                });
+                laneList.Sort((float[] x, float[] y) => (-x[1]).CompareTo((-y[1])));
             }
 
             GUILayout.BeginHorizontal();
@@ -2752,9 +2675,7 @@ namespace TrafficManager
 
                         while (num30 < info0.m_lanes.Length && num20 != 0u)
                         {
-                            if (info0.m_lanes[num30].m_laneType != NetInfo.LaneType.Pedestrian &&
-                                info0.m_lanes[num30].m_laneType != NetInfo.LaneType.Parking &&
-                                info0.m_lanes[num30].m_laneType != NetInfo.LaneType.None)
+                            if ((info0.m_lanes[num30].m_laneType & NetInfo.LaneType.Vehicle) != 0)
                             {
                                 laneList0.Add(new float[3] { num20, info0.m_lanes[num30].m_position, num30});
                             }
@@ -2765,29 +2686,11 @@ namespace TrafficManager
 
                         if (!TrafficLightsManual.segmentIsOneWay(SelectedSegmentIndexes[i]))
                         {
-                            laneList0.Sort(delegate(float[] x, float[] y)
-                            {
-                                if (Mathf.Abs(y[1]) > Mathf.Abs(x[1]))
-                                {
-                                    return -1;
-                                }
-
-                                return 1;
-                            });
+                            laneList0.Sort((float[] x, float[] y) => Mathf.Abs(x[1]).CompareTo(Mathf.Abs(y[1])));
                         }
                         else
                         {
-                            laneList0.Sort(delegate(float[] x, float[] y)
-                            {
-                                if (x[1] > y[1])
-                                {
-                                    return -1;
-                                }
-                                else
-                                {
-                                    return 1;
-                                }
-                            });
+                            laneList0.Sort((float[] x, float[] y) => (-x[1]).CompareTo((-y[1])));
                         }
 
                         for (var j = 0; j < laneList0.Count; j++)
@@ -2854,9 +2757,7 @@ namespace TrafficManager
 
             while (num3 < info2.m_lanes.Length && num2 != 0u)
             {
-                if (info2.m_lanes[num3].m_laneType != NetInfo.LaneType.Pedestrian &&
-                    info2.m_lanes[num3].m_laneType != NetInfo.LaneType.Parking &&
-                    info2.m_lanes[num3].m_laneType != NetInfo.LaneType.None)
+                if ((info2.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0)
                 {
                     laneList.Add(new float[3] {num2, info2.m_lanes[num3].m_position, num3});
                     numLanes++;
@@ -2868,29 +2769,11 @@ namespace TrafficManager
 
             if (!TrafficLightsManual.segmentIsOneWay(SelectedSegmentIndexes[0]))
             {
-                laneList.Sort(delegate(float[] x, float[] y)
-                {
-                    if (Mathf.Abs(y[1]) > Mathf.Abs(x[1]))
-                    {
-                        return -1;
-                    }
-                        
-                    return 1;
-                });
+                laneList.Sort((float[] x, float[] y) => Mathf.Abs(x[1]).CompareTo(Mathf.Abs(y[1])));
             }
             else
             {
-                laneList.Sort(delegate(float[] x, float[] y)
-                {
-                    if (x[1] > y[1])
-                    {
-                        return -1;
-                    }
-                    else
-                    {
-                        return 1;
-                    }
-                });
+                laneList.Sort((float[] x, float[] y) => (-x[1]).CompareTo(-y[1]));
             }
 
             GUILayout.BeginHorizontal();
