@@ -394,6 +394,19 @@ namespace KiwiManager
             return Math.Abs(Vector3.Cross(fromDir, toDir).y) < 0.5;
         }
 
+        public static NetLane.Flags GetTurnDirection(int fromSegment, int toSegment, ushort nodeid)
+        {
+            Vector3 fromDir = GetSegmentDir(fromSegment, nodeid);
+            fromDir.y = 0;
+            fromDir.Normalize();
+            Vector3 toDir = GetSegmentDir(toSegment, nodeid);
+            toDir.y = 0;
+            toDir.Normalize();
+            float cross = Vector3.Cross(fromDir, toDir).y;
+            if (Mathf.Abs(cross) < 0.5) return NetLane.Flags.Forward;
+            return cross < 0 ? NetLane.Flags.Right : NetLane.Flags.Left;
+        }
+
         public static bool HasLeftSegment(int segmentID, ushort nodeID, bool debug = false)
         {
             var node = TrafficLightTool.GetNetNode(nodeID);

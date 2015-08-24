@@ -2601,6 +2601,32 @@ namespace KiwiManager
 
             laneList.Sort();
 
+            List<NetLane.Flags> targets = new List<NetLane.Flags>();
+            ushort oidx = segment.GetLeftSegment(TrafficLightTool.SelectedNode);
+            while (oidx != _selectedSegmentIdx)
+            {
+                NetSegment oseg = Singleton<NetManager>.instance.m_segments.m_buffer[oidx];
+
+                NetInfo.Direction odir = oseg.m_endNode == TrafficLightTool.SelectedNode ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+                if ((oseg.m_flags & NetSegment.Flags.Invert) != 0) odir = NetInfo.InvertDirection(odir);
+                NetInfo.Direction odir3 = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(odir) : odir;
+
+                NetInfo oinfo = oseg.Info;
+                uint olaneid = oseg.m_lanes;
+
+                NetLane.Flags turnDirection = TrafficPriority.GetTurnDirection(_selectedSegmentIdx, oidx, TrafficLightTool.SelectedNode);
+                for (uint num3 = 0; num3 < oinfo.m_lanes.Length && olaneid != 0; ++num3)
+                {
+                    if ((oinfo.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && oinfo.m_lanes[num3].m_direction != odir3)
+                    {
+                        targets.Add(turnDirection);
+                    }
+                    olaneid = Singleton<NetManager>.instance.m_lanes.m_buffer[olaneid].m_nextLane;
+                }
+
+                oidx = oseg.GetLeftSegment(_selectedNetNodeIdx);
+            }
+
             GUILayout.BeginHorizontal();
 
             for (int i = 0; i < laneList.Count; i++)
@@ -2623,9 +2649,103 @@ namespace KiwiManager
                 GUILayout.BeginVertical(laneStyle);
 //                GUILayout.Label("Lane " + (i + 1) + " mips: " + signStop.mipmapCount + " w:" + signStop.width, laneTitleStyle);
                 GUILayout.Label("Lane " + (i + 1), laneTitleStyle);
+                    GUIStyle targetStyle;
                     GUILayout.BeginVertical();
-                    GUILayout.Label(string.Format("m_firstTarget: {0}", Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget));
-                    GUILayout.Label(string.Format("m_lastTarget: {0}", Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget));
+                    int firstTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
+                    int lastTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
+                    bool update = false;
+                    GUILayout.BeginHorizontal();
+                        GUILayout.Label(string.Format("m_firstTarget: {0}", firstTarget));
+                        targetStyle = (firstTarget <= 0 || i > 0 && firstTarget <= Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i - 1].laneid].m_firstTarget)
+                                ? style2 : style1;
+                        if (GUILayout.Button("−", targetStyle, new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(25) }) &&
+                                firstTarget > 0)
+                        {
+                            --Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
+                            update = true;
+                        }
+                        targetStyle = (firstTarget < lastTarget) ? style1 : style2;
+                        if (GUILayout.Button("+", targetStyle, new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(25) }) &&
+                                firstTarget < lastTarget)
+                        {
+                            ++Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
+                            update = true;
+                        }
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                        GUILayout.Label(string.Format("m_lastTarget: {0}", lastTarget));
+                        if (GUILayout.Button("−", targetStyle, new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(25) }) &&
+                                firstTarget < lastTarget)
+                        {
+                            --Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
+                            update = true;
+                        }
+                        targetStyle = (firstTarget < lastTarget) ? style1 : style2;
+                        targetStyle = (lastTarget >= targets.Count || i + 1 < laneList.Count && lastTarget >= Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i + 1].laneid].m_firstTarget)
+                                ? style2 : style1;
+                        if (GUILayout.Button("+", targetStyle, new GUILayoutOption[2] { GUILayout.Width(25), GUILayout.Height(25) }) &&
+                                lastTarget < targets.Count)
+                        {
+                            ++Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
+                            update = true;
+                        }
+                    GUILayout.EndHorizontal();
+                    if (update)
+                    {
+                        firstTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
+                        lastTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
+                        ushort nlf = (ushort) (Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_flags & ~((ushort) NetLane.Flags.LeftForwardRight));
+                        for (int t = firstTarget; t < lastTarget; ++t)
+                        {
+                            nlf |= (ushort) targets[t];
+                        }
+                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_flags = nlf;
+                                NetLane.Flags flag;
+                                if ((segment.m_startNode == TrafficLightTool.SelectedNode) ^ (TrafficPriority.leftHandDrive))
+                                {
+                                    flag = NetLane.Flags.StartOneWayLeft;
+                                }
+                                else
+                                {
+                                    flag = NetLane.Flags.EndOneWayLeft;
+                                }
+                                if (TrafficPriority.hasLeftLane(TrafficLightTool.SelectedNode, _selectedSegmentIdx))
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags &= (ushort) ~flag;
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags |= (ushort) flag;
+                                    }
+                                }
+                                if ((segment.m_startNode == TrafficLightTool.SelectedNode) ^ (TrafficPriority.leftHandDrive))
+                                {
+                                    flag = NetLane.Flags.StartOneWayRight;
+                                }
+                                else
+                                {
+                                    flag = NetLane.Flags.EndOneWayRight;
+                                }
+                                if (TrafficPriority.hasRightLane(TrafficLightTool.SelectedNode, _selectedSegmentIdx))
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags &= (ushort) ~flag;
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (uint laneid in allLanes)
+                                    {
+                                        Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags |= (ushort) flag;
+                                    }
+                                }
+                    }
                     /*
                     Bezier3 bezier = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_bezier;
                     GUILayout.Label("m_bezier:");
