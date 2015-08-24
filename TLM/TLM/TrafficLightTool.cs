@@ -521,19 +521,26 @@ namespace KiwiManager
                     NetInfo oinfo = oseg.Info;
                     uint olaneid = oseg.m_lanes;
 
+                    List<OrderedLane> laneList = new List<OrderedLane>();
                     for (uint num3 = 0; num3 < oinfo.m_lanes.Length && olaneid != 0; ++num3)
                     {
                         if ((oinfo.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && oinfo.m_lanes[num3].m_direction != odir3)
                         {
-                            Bezier3 bezier = Singleton<NetManager>.instance.m_lanes.m_buffer[olaneid].m_bezier;
-                            if (oseg.m_endNode != _selectedNetNodeIdx)
-                            {
-                                bezier = bezier.Invert();
-                            }
-                            RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.red, bezier.d, 2, -1, 1280, false, true);
-                            targets.Add(bezier);
+                            laneList.Add(new OrderedLane(olaneid, oinfo.m_lanes[num3].m_position, num3, odir));
                         }
                         olaneid = Singleton<NetManager>.instance.m_lanes.m_buffer[olaneid].m_nextLane;
+                    }
+                    laneList.Sort();
+                    laneList.Reverse();
+                    foreach (OrderedLane lane in laneList)
+                    {
+                        Bezier3 bezier = Singleton<NetManager>.instance.m_lanes.m_buffer[lane.laneid].m_bezier;
+                        if (oseg.m_endNode != _selectedNetNodeIdx)
+                        {
+                            bezier = bezier.Invert();
+                        }
+                        RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.red, bezier.d, 2, -1, 1280, false, true);
+                        targets.Add(bezier);
                     }
 
                     oidx = oseg.GetLeftSegment(_selectedNetNodeIdx);
