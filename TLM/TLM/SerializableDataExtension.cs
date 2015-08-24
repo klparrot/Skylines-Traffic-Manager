@@ -218,14 +218,18 @@ namespace KiwiManager
                 }
             }
 
-            var lanes = configuration.laneFlags.Split(',');
+            string[] lanes = configuration.laneFlags.Split(',');
 
-            for (var i = 0; i < lanes.Length; i++)
+            foreach (string lanespec in lanes)
             {
-                var split = lanes[i].Split(':');
-
-                Singleton<NetManager>.instance.m_lanes.m_buffer[Convert.ToInt32(split[0])].m_flags =
-                    Convert.ToUInt16(split[1]);
+                string[] split = lanespec.Split(':');
+                int laneid = Convert.ToInt32(split[0]);
+                Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags = Convert.ToUInt16(split[1]);
+                if (split.Length >= 4)
+                {
+                    Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_firstTarget = Convert.ToByte(split[2]);
+                    Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_lastTarget = Convert.ToByte(split[3]);
+                }
             }
         }
 
@@ -370,7 +374,10 @@ namespace KiwiManager
 
                 if (TrafficPriority.prioritySegments.ContainsKey(laneSegment))
                 {
-                    configuration.laneFlags += i + ":" + Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_flags + ",";
+                    configuration.laneFlags += string.Format("{0}:{1}:{2}:{3},", i,
+                            Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_flags,
+                            Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_firstTarget,
+                            Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_lastTarget);
                 }
             }
 
