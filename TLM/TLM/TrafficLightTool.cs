@@ -505,6 +505,78 @@ namespace KiwiManager
                 var segment = Singleton<NetManager>.instance.m_segments.m_buffer[_selectedSegmentIdx];
 
                 NetTool.RenderOverlay(cameraInfo, ref segment, GetToolColor(true, false), GetToolColor(true, false));
+
+                var node = GetNetNode(_selectedNetNodeIdx);
+
+                List<Bezier3> targets = new List<Bezier3>();
+                ushort oidx = segment.GetLeftSegment(_selectedNetNodeIdx);
+                while (oidx != _selectedSegmentIdx)
+                {
+                    NetSegment oseg = Singleton<NetManager>.instance.m_segments.m_buffer[oidx];
+
+                    NetInfo.Direction odir = oseg.m_endNode == _selectedNetNodeIdx ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+                    if ((oseg.m_flags & NetSegment.Flags.Invert) != 0) odir = NetInfo.InvertDirection(odir);
+                    NetInfo.Direction odir3 = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(odir) : odir;
+
+                    NetInfo oinfo = oseg.Info;
+                    uint olaneid = oseg.m_lanes;
+
+                    for (uint num3 = 0; num3 < oinfo.m_lanes.Length && olaneid != 0; ++num3)
+                    {
+                        if ((oinfo.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && oinfo.m_lanes[num3].m_direction != odir3)
+                        {
+                            Bezier3 bezier = Singleton<NetManager>.instance.m_lanes.m_buffer[olaneid].m_bezier;
+                            if (oseg.m_endNode != _selectedNetNodeIdx)
+                            {
+                                bezier = bezier.Invert();
+                            }
+                            RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.red, bezier.d, 2, -1, 1280, false, true);
+                            targets.Add(bezier);
+                        }
+                        olaneid = Singleton<NetManager>.instance.m_lanes.m_buffer[olaneid].m_nextLane;
+                    }
+
+                    oidx = oseg.GetLeftSegment(_selectedNetNodeIdx);
+                }
+
+                NetInfo.Direction dir = segment.m_endNode == _selectedNetNodeIdx ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+                if ((segment.m_flags & NetSegment.Flags.Invert) != 0) dir = NetInfo.InvertDirection(dir);
+                NetInfo.Direction dir3 = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir) : dir;
+
+                NetInfo info = segment.Info;
+                uint laneid = segment.m_lanes;
+
+                for (uint num3 = 0; num3 < info.m_lanes.Length && laneid != 0; ++num3)
+                {
+                    if ((info.m_lanes[num3].m_laneType & NetInfo.LaneType.Vehicle) != 0 && info.m_lanes[num3].m_direction == dir3)
+                    {
+                        Bezier3 bezier = Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_bezier;
+                        if (segment.m_endNode == _selectedNetNodeIdx)
+                        {
+                            bezier = bezier.Invert();
+                        }
+                        RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.white, bezier.a, 2, -1, 1280, false, true);
+                        Vector3 v = bezier.a - bezier.b;
+                        v.y = 0;
+                        v.Normalize();
+                        v *= 8;
+                        bezier.b = bezier.a + v;
+                        uint firstTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_firstTarget;
+                        uint lastTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_lastTarget;
+                        for (int theTarget = (int) firstTarget; theTarget < lastTarget; ++theTarget)
+                        {
+                            Bezier3 obez = targets[theTarget];
+                            v = obez.d - obez.c;
+                            v.y = 0;
+                            v.Normalize();
+                            v *= 8;
+                            bezier.d = obez.d;
+                            bezier.c = obez.d + v;
+                            RenderManager.instance.OverlayEffect.DrawBezier(cameraInfo, Color.yellow, bezier, 0.125f, 0, 0, -1, 1280, false, true);
+                        }
+                    }
+                    laneid = Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_nextLane;
+                }
             }
         }
 
@@ -2545,6 +2617,16 @@ namespace KiwiManager
 //                GUILayout.Label("Lane " + (i + 1) + " mips: " + signStop.mipmapCount + " w:" + signStop.width, laneTitleStyle);
                 GUILayout.Label("Lane " + (i + 1), laneTitleStyle);
                     GUILayout.BeginVertical();
+                    GUILayout.Label(string.Format("m_firstTarget: {0}", Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget));
+                    GUILayout.Label(string.Format("m_lastTarget: {0}", Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget));
+                    /*
+                    Bezier3 bezier = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_bezier;
+                    GUILayout.Label("m_bezier:");
+                    GUILayout.Label(string.Format(".a: ({0},{1})", bezier.a.x, bezier.a.z));
+                    GUILayout.Label(string.Format(".b: ({0},{1})", bezier.b.x, bezier.b.z));
+                    GUILayout.Label(string.Format(".c: ({0},{1})", bezier.c.x, bezier.c.z));
+                    GUILayout.Label(string.Format(".d: ({0},{1})", bezier.d.x, bezier.d.z));
+                    */
                         GUILayout.BeginHorizontal();
                         if (TrafficPriority.HasLeftSegment(_selectedSegmentIdx, TrafficLightTool.SelectedNode))
                         {

@@ -713,7 +713,7 @@ namespace KiwiManager
 
                         if (TrafficPriority.leftHandDrive)
                         {
-                            m_lanes.Reverse();
+//                            m_lanes.Reverse();
                         }
 
                         var laneArrows = 0;
@@ -728,6 +728,7 @@ namespace KiwiManager
                                 laneArrows++;
                             }
 
+                            var infoLanes2 = m_lanes.Length - 1 - infoLanes;
                             if (m_lanes[infoLanes].m_laneType == NetInfo.LaneType.Vehicle && m_lanes[infoLanes].m_direction == dir3)
                             {
                                 if (TrafficPriority.isLeftSegment(num16, item.m_position.m_segment, nodeID))
