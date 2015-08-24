@@ -689,7 +689,8 @@ namespace KiwiManager
                         break;
                     }
 
-                    if (TrafficPriority.isPrioritySegment(nodeID, num16) && data.m_position00.m_segment != num16)
+#if PRISEG
+                    if (false && TrafficPriority.isPrioritySegment(nodeID, num16) && data.m_position00.m_segment != num16)
                     {
                         var segment = instance.m_segments.m_buffer[num16];
 
@@ -841,6 +842,7 @@ namespace KiwiManager
                             }
                         }
                     }
+#endif
                     //else if (TrafficRoadRestrictions.isSegment(num16))
                     //{
                     //    var restSegment = TrafficRoadRestrictions.getSegment(num16);
