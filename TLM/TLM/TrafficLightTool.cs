@@ -2628,65 +2628,86 @@ namespace KiwiManager
                 oidx = oseg.GetLeftSegment(_selectedNetNodeIdx);
             }
 
+            GUIStyle style1 = new GUIStyle("button");
+            GUIStyle style2 = new GUIStyle("button");
+            style2.normal.textColor = Color.red;
+            style2.hover.textColor = Color.red;
+            style2.focused.textColor = Color.red;
+
+            GUIStyle labelStyle = new GUIStyle();
+            labelStyle.alignment = TextAnchor.MiddleCenter;
+            int margin = (int) Mathf.Round(labelStyle.lineHeight * .25f);
+            labelStyle.margin = new RectOffset(margin, margin, margin, margin);
+
+            GUIStyle richTextStyle = new GUIStyle(labelStyle);
+            richTextStyle.richText = true;
+
+            GUIStyle whiteLabelStyle = new GUIStyle(labelStyle);
+            whiteLabelStyle.normal.textColor = Color.white;
+
+            GUIStyle redLabelStyle = new GUIStyle(labelStyle);
+            redLabelStyle.normal.textColor = Color.red;
+
+            GUIStyle laneStyle = new GUIStyle();
+            laneStyle.padding = new RectOffset(8, 8, 8, 8);
+
             GUILayout.BeginHorizontal();
     //{
             for (int i = 0; i < laneList.Count; i++)
             {
                 NetLane.Flags flags = (NetLane.Flags) Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_flags;
 
-                GUIStyle style1 = new GUIStyle("button");
-                GUIStyle style2 = new GUIStyle("button");
-                style2.normal.textColor = new Color32(255, 0, 0, 255);
-                style2.hover.textColor = new Color32(255, 0, 0, 255);
-                style2.focused.textColor = new Color32(255, 0, 0, 255);
-
-                GUIStyle laneStyle = new GUIStyle();
-                laneStyle.contentOffset = new Vector2(12f, 0f);
-
-                GUIStyle laneTitleStyle = new GUIStyle();
-                laneTitleStyle.contentOffset = new Vector2(36f, 2f);
-                laneTitleStyle.normal.textColor = new Color(1f, 1f, 1f);
-
                 GUILayout.BeginVertical(laneStyle);
       //{
 
-                GUILayout.Label("Lane " + (i + 1), laneTitleStyle);
-                GUIStyle targetStyle;
+                string arrows = "<b><size=24>";
+                arrows += ((flags & NetLane.Flags.Left) != NetLane.Flags.None) ? "<color=#ffffffff>←</color>" : "<color=#ffffff00>←</color>";
+                arrows += ((flags & NetLane.Flags.Forward) != NetLane.Flags.None) ? "<color=#ffffffff>↑</color>" : "<color=#ffffff00>↑</color>";
+                arrows += ((flags & NetLane.Flags.Right) != NetLane.Flags.None) ? "<color=#ffffffff>→</color>" : "<color=#ffffff00>→</color>";
+                arrows += "</size></b>";
+                GUILayout.Label(arrows, richTextStyle, GUILayout.ExpandWidth(true));
 
-                GUILayout.BeginVertical();
-        //{
+                GUIStyle targetStyle;
 
                 int firstTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
                 int lastTarget = Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
                 bool update = false;
-                if (firstTarget < lastTarget)
+                if (firstTarget <= lastTarget && lastTarget <= targets.Count)
                 {
                     StringBuilder label = new StringBuilder();
+                    label.Append("<size=12><color=#99886699>");
+                    for (int ln = 0; ln < firstTarget; label.Append(ln++).Append(' '));
+                    label.Append("</color><color=#ffeeccff>");
+                    if (firstTarget == lastTarget) label.Append('.');
                     for (int ln = firstTarget; ln < lastTarget; label.Append(ln++).Append(' '));
-                    GUILayout.Label(label.ToString());
+                    label.Append("</color><color=#99886699>");
+                    for (int ln = lastTarget; ln < targets.Count; label.Append(ln++).Append(' '));
+                    label.Append("</color></size>");
+                    GUILayout.Label(label.ToString(), richTextStyle, GUILayout.ExpandWidth(true));
                 }
                 else
                 {
-                    GUILayout.Label(string.Format("{0}≤ <{1} ", firstTarget, lastTarget), style2);
+                    GUILayout.Label(string.Format("{0}≤ <{1} ", firstTarget, lastTarget), redLabelStyle, GUILayout.ExpandWidth(true));
                 }
                 GUILayout.BeginHorizontal();
-          //{
-                targetStyle = (firstTarget <= 0 || i > 0 && firstTarget <= Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i - 1].laneid].m_firstTarget)
+        //{
+                GUILayoutOption[] squareLayout = new GUILayoutOption[2] { GUILayout.Width(24), GUILayout.Height(24) };
+                targetStyle = (firstTarget <= 0 || i > 0 && firstTarget <= Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i - 1].laneid].m_lastTarget)
                         ? style2 : style1;
-                if (GUILayout.Button("−", targetStyle, new GUILayoutOption[2] { GUILayout.Width(16), GUILayout.Height(16) })
+                if (GUILayout.Button("−", targetStyle, squareLayout)
                         )//&& firstTarget > 0)
                 {
                     --Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
                     update = true;
                 }
                 targetStyle = (firstTarget < lastTarget) ? style1 : style2;
-                if (GUILayout.Button("+", targetStyle, new GUILayoutOption[2] { GUILayout.Width(16), GUILayout.Height(16) })
+                if (GUILayout.Button("+", targetStyle, squareLayout)
                         )//&& firstTarget < lastTarget)
                 {
                     ++Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_firstTarget;
                     update = true;
                 }
-                if (GUILayout.Button("−", targetStyle, new GUILayoutOption[2] { GUILayout.Width(16), GUILayout.Height(16) })
+                if (GUILayout.Button("−", targetStyle, squareLayout)
                         )//&& firstTarget < lastTarget)
                 {
                     --Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
@@ -2694,13 +2715,13 @@ namespace KiwiManager
                 }
                 targetStyle = (lastTarget >= targets.Count || i + 1 < laneList.Count && lastTarget >= Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i + 1].laneid].m_firstTarget)
                         ? style2 : style1;
-                if (GUILayout.Button("+", targetStyle, new GUILayoutOption[2] { GUILayout.Width(16), GUILayout.Height(16) })
+                if (GUILayout.Button("+", targetStyle, squareLayout)
                         && lastTarget < targets.Count)
                 {
                     ++Singleton<NetManager>.instance.m_lanes.m_buffer[laneList[i].laneid].m_lastTarget;
                     update = true;
                 }
-          //}
+        //}
                 GUILayout.EndHorizontal();
                 if (update)
                 {
@@ -2764,13 +2785,6 @@ namespace KiwiManager
                         }
                     }
                 }
-                string arrows = string.Empty;
-                if ((flags & NetLane.Flags.Left) != NetLane.Flags.None) arrows += "←";
-                if ((flags & NetLane.Flags.Forward) != NetLane.Flags.None) arrows += "↑";
-                if ((flags & NetLane.Flags.Right) != NetLane.Flags.None) arrows += "→";
-                GUILayout.Label(arrows);
-        //}
-                GUILayout.EndVertical();
       //}
                 GUILayout.EndVertical();
             }
