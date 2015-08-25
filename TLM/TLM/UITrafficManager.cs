@@ -75,51 +75,53 @@ namespace KiwiManager
 
             this.backgroundSprite = "GenericPanel";
             this.color = new Color32(75, 75, 135, 255);
-            this.width = 250;
+            this.width = 240;
             this.height = !LoadingExtension.PathfinderIncompatibility ? 390 : 310;
-            this.relativePosition = new Vector3(10.48f, 80f);
+            this.relativePosition = new Vector3(80f, 50f);
 
             UILabel title = this.AddUIComponent<UILabel>();
             title.text = "Traffic Manager";
-            title.relativePosition = new Vector3(65.0f, 5.0f);
+            title.width = 200;
+            title.textAlignment = UIHorizontalAlignment.Center;
+            title.relativePosition = new Vector3(20f, 5f);
 
             if (!LoadingExtension.PathfinderIncompatibility)
             {
-                buttonSwitchTraffic = _createButton("Switch traffic lights", new Vector3(35f, 30f), clickSwitchTraffic);
-                buttonPrioritySigns = _createButton("Add priority signs", new Vector3(35f, 70f), clickAddPrioritySigns);
-                buttonManualControl = _createButton("Manual traffic lights", new Vector3(35f, 110f), clickManualControl);
-                buttonTimedMain = _createButton("Timed traffic lights", new Vector3(35f, 150f), clickTimedAdd);
-                buttonLaneChange = _createButton("Change lanes", new Vector3(35f, 190f), clickChangeLanes);
-                //buttonLaneRestrictions = _createButton("Road Restrictions", new Vector3(35f, 230f), clickLaneRestrictions);
-                buttonCrosswalk = _createButton("Add/Remove Crosswalk", new Vector3(35f, 230f), clickCrosswalk);
-                buttonClearTraffic = _createButton("Clear Traffic", new Vector3(35f, 270f), clickClearTraffic);
-                buttonToggleDespawn = _createButton(LoadingExtension.Instance.despawnEnabled ? "Disable despawning" : "Enable despawning", new Vector3(35f, 310f), clickToggleDespawn);
-                buttonDumpSVG = _createButton("Export to SVG", new Vector3(35f, 350f), clickDumpSVG);
+                buttonSwitchTraffic = _createButton("Switch traffic lights", new Vector3(20f, 30f), clickSwitchTraffic);
+                buttonPrioritySigns = _createButton("Add priority signs", new Vector3(20f, 70f), clickAddPrioritySigns);
+                buttonManualControl = _createButton("Manual traffic lights", new Vector3(20f, 110f), clickManualControl);
+                buttonTimedMain = _createButton("Timed traffic lights", new Vector3(20f, 150f), clickTimedAdd);
+                buttonLaneChange = _createButton("Change lanes", new Vector3(20f, 190f), clickChangeLanes);
+                //buttonLaneRestrictions = _createButton("Road Restrictions", new Vector3(20f, 230f), clickLaneRestrictions);
+                buttonCrosswalk = _createButton("Add/Remove Crosswalk", new Vector3(20f, 230f), clickCrosswalk);
+                buttonClearTraffic = _createButton("Clear Traffic", new Vector3(20f, 270f), clickClearTraffic);
+                buttonToggleDespawn = _createButton(LoadingExtension.Instance.despawnEnabled ? "Disable despawning" : "Enable despawning", new Vector3(20f, 310f), clickToggleDespawn);
+                buttonDumpSVG = _createButton("Export to SVG", new Vector3(20f, 350f), clickDumpSVG);
 
             }
             else
             {
-                buttonSwitchTraffic = _createButton("Switch traffic lights", new Vector3(35f, 30f), clickSwitchTraffic);
-                buttonPrioritySigns = _createButton("Add priority signs", new Vector3(35f, 70f), clickAddPrioritySigns);
-                buttonManualControl = _createButton("Manual traffic lights", new Vector3(35f, 110f), clickManualControl);
-                buttonTimedMain = _createButton("Timed traffic lights", new Vector3(35f, 150f), clickTimedAdd);
-                buttonCrosswalk = _createButton("Add/Remove Crosswalk", new Vector3(35f, 190f), clickCrosswalk);
-                buttonClearTraffic = _createButton("Clear Traffic", new Vector3(35f, 230f), clickClearTraffic);
-                buttonDumpSVG = _createButton("Export to SVG", new Vector3(35f, 270f), clickDumpSVG);
+                buttonSwitchTraffic = _createButton("Switch traffic lights", new Vector3(20f, 30f), clickSwitchTraffic);
+                buttonPrioritySigns = _createButton("Add priority signs", new Vector3(20f, 70f), clickAddPrioritySigns);
+                buttonManualControl = _createButton("Manual traffic lights", new Vector3(20f, 110f), clickManualControl);
+                buttonTimedMain = _createButton("Timed traffic lights", new Vector3(20f, 150f), clickTimedAdd);
+                buttonCrosswalk = _createButton("Add/Remove Crosswalk", new Vector3(20f, 190f), clickCrosswalk);
+                buttonClearTraffic = _createButton("Clear Traffic", new Vector3(20f, 230f), clickClearTraffic);
+                buttonDumpSVG = _createButton("Export to SVG", new Vector3(20f, 270f), clickDumpSVG);
             }
         }
 
         private UIButton _createButton(string text, Vector3 pos, MouseEventHandler eventClick)
         {
             var button = this.AddUIComponent<UIButton>();
-            button.width = 190;
+            button.width = 200;
             button.height = 30;
             button.normalBgSprite = "ButtonMenu";
             button.disabledBgSprite = "ButtonMenuDisabled";
             button.hoveredBgSprite = "ButtonMenuHovered";
             button.focusedBgSprite = "ButtonMenu";
             button.pressedBgSprite = "ButtonMenuPressed";
-            button.textColor = new Color32(255, 255, 255, 255);
+            button.textColor = Color.white;
             button.playAudioEvents = true;
             button.text = text;
             button.relativePosition = pos;

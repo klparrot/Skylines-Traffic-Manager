@@ -45,7 +45,7 @@ namespace KiwiManager
             button.playAudioEvents = true;
 
             // Place the button.
-            button.relativePosition = new Vector3(180f, 20f);
+            button.relativePosition = new Vector3(120f, 20f);
 
             // Respond to button click.
             button.eventClick += ButtonClick;
