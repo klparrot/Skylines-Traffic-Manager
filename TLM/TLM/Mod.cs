@@ -62,7 +62,7 @@ namespace KiwiManager
                         {
                             typeof (ushort), typeof (Vehicle).MakeByRefType(), typeof (PathUnit.Position),
                             typeof (PathUnit.Position), typeof (uint), typeof (byte), typeof (PathUnit.Position),
-                            typeof (uint), typeof (byte), typeof (Vector3).MakeByRefType(),
+                            typeof (uint), typeof (byte), typeof (int), typeof (Vector3).MakeByRefType(),
                             typeof (Vector3).MakeByRefType(), typeof (float).MakeByRefType()
                         },
                         null),
@@ -125,7 +125,7 @@ namespace KiwiManager
                     //srcMethod8 = typeof(CarAI).GetMethod("StartPathFind",
                     //    BindingFlags.NonPublic | BindingFlags.Instance,
                     //    null,
-                    //    new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType(), typeof(Vector3), typeof(Vector3), typeof(bool), typeof(bool) },
+                    //    new Type[] { typeof(ushort), typeof(Vehicle).MakeByRefType(), typeof(Vector3), typeof(Vector3), typeof(bool), typeof(bool), typeof(bool) },
                     //    null);
 
                     //destMethod[8 = typeof(CustomCarAI).GetMethod("StartPathFind");

@@ -559,7 +559,7 @@ namespace KiwiManager
                     int laneIndex2;
                     uint num2;
                     uint num3;
-                    instance.m_segments.m_buffer[(int)segment2].GetLeftAndRightLanes(nodeID, NetInfo.LaneType.Pedestrian, VehicleInfo.VehicleType.None, lane2, out laneIndex, out laneIndex2, out num2, out num3);
+                    instance.m_segments.m_buffer[(int)segment2].GetLeftAndRightLanes(nodeID, NetInfo.LaneType.Pedestrian, VehicleInfo.VehicleType.None, lane2, false, out laneIndex, out laneIndex2, out num2, out num3);
                     ushort num4 = segment2;
                     ushort num5 = segment2;
                     if (num2 == 0u || num3 == 0u)
@@ -574,7 +574,7 @@ namespace KiwiManager
                             int num8;
                             uint num9;
                             uint num10;
-                            instance.m_segments.m_buffer[(int)leftSegment].GetLeftAndRightLanes(nodeID, NetInfo.LaneType.Pedestrian, VehicleInfo.VehicleType.None, -1, out num7, out num8, out num9, out num10);
+                            instance.m_segments.m_buffer[(int)leftSegment].GetLeftAndRightLanes(nodeID, NetInfo.LaneType.Pedestrian, VehicleInfo.VehicleType.None, -1, false, out num7, out num8, out num9, out num10);
                             if (num10 != 0u)
                             {
                                 num4 = leftSegment;
@@ -597,7 +597,7 @@ namespace KiwiManager
                             int num12;
                             uint num13;
                             uint num14;
-                            instance.m_segments.m_buffer[(int)rightSegment].GetLeftAndRightLanes(nodeID, NetInfo.LaneType.Pedestrian, VehicleInfo.VehicleType.None, -1, out num11, out num12, out num13, out num14);
+                            instance.m_segments.m_buffer[(int)rightSegment].GetLeftAndRightLanes(nodeID, NetInfo.LaneType.Pedestrian, VehicleInfo.VehicleType.None, -1, false, out num11, out num12, out num13, out num14);
                             if (num13 != 0u)
                             {
                                 num5 = rightSegment;

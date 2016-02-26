@@ -126,6 +126,7 @@ namespace KiwiManager
             }
         }
 
+/*
         public bool StartPathFind2(ushort vehicleID, ref Vehicle vehicleData, Vector3 startPos, Vector3 endPos, bool startBothWays, bool endBothWays)
         {
             if ((vehicleData.m_flags & (Vehicle.Flags.TransferToSource | Vehicle.Flags.GoingBack)) != Vehicle.Flags.None)
@@ -200,5 +201,6 @@ namespace KiwiManager
             }
             return false;
         }
+*/
     }
 }

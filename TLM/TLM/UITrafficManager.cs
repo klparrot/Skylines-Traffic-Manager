@@ -394,7 +394,7 @@ namespace KiwiManager
                 writer.Write(" {0}=\"{1:F}\"", "m_laneType", lane.m_laneType);
                 writer.Write(" {0}=\"{1:F}\"", "m_vehicleType", lane.m_vehicleType);
                 writer.Write(" {0}=\"{1:F}\"", "m_laneProps", lane.m_laneProps);
-                writer.Write(" {0}=\"{1}\"", "m_allowStop", lane.m_allowStop);
+//                writer.Write(" {0}=\"{1}\"", "m_allowStop", lane.m_allowStop);
                 writer.Write(" {0}=\"{1}\"", "m_useTerrainHeight", lane.m_useTerrainHeight);
                 writer.Write(" {0}=\"{1:F}\"", "m_finalDirection", lane.m_finalDirection);
                 writer.Write(" {0}=\"{1}\"", "m_similarLaneIndex", lane.m_similarLaneIndex);

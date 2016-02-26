@@ -20,6 +20,7 @@ namespace KiwiManager
             }
         }
 
+/*
         public bool StartPathFind2(ushort vehicleID, ref Vehicle vehicleData, Vector3 startPos, Vector3 endPos, bool startBothWays, bool endBothWays)
         {
             VehicleInfo info = this.m_info;
@@ -90,5 +91,6 @@ namespace KiwiManager
             }
             return 0;
         }
+*/
     }
 }
