@@ -980,7 +980,7 @@ namespace KiwiManager
             return nodeid != 0 && (node.m_flags & (NetNode.Flags.Transition | NetNode.Flags.TrafficLights)) == NetNode.Flags.None;
         }
 
-        protected override void OnToolGUI()
+        protected override void OnToolGUI(UnityEngine.Event e)
         {
             if (!Input.GetMouseButtonDown(0))
             {
