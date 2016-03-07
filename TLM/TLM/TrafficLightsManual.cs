@@ -14,7 +14,7 @@ namespace KiwiManager
         public ManualSegmentLight instance_2;
     }
 
-    class ManualSegmentLight
+    public class ManualSegmentLight
     {
         public enum Mode
         {

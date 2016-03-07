@@ -50,6 +50,7 @@ namespace KiwiManager
 
             if (data == null)
             {
+                Log.Message("No serialized ID");
                 GenerateUniqueID();
             }
             else
@@ -73,11 +74,12 @@ namespace KiwiManager
             }
 
             var filepath = Path.Combine(Application.dataPath, "kiwiManagerSave_" + uniqueID + ".xml");
+            Log.Message("Loading from " + filepath);
             _timer.Enabled = false;
 
             if (!File.Exists(filepath))
             {
-                
+                Log.Warning("Serialized data file does not exist!");
                 return;
             }
 
@@ -131,15 +133,28 @@ namespace KiwiManager
             var timedStepCount = 0;
             var timedStepSegmentCount = 0;
 
+            Log.Message("got to timed nodes");
+            {
+            int q_i = -1;
+            int q_j = -1;
+            int q_k = -1;
+            ushort q_nodeid = 0;
+            try {
             for (var i = 0; i < configuration.timedNodes.Count; i++)
             {
+                q_i = i;
+                q_j = -1;
+                q_k = -1;
                 var nodeid = (ushort)configuration.timedNodes[i][0];
+                q_nodeid = nodeid;
 
                 var nodeGroup = new List<ushort>();
                 for (var j = 0; j < configuration.timedNodeGroups[i].Length; j++)
                 {
+                    q_j = j;
                     nodeGroup.Add(configuration.timedNodeGroups[i][j]);
                 }
+                q_j = -2;
 
                 if (!TrafficLightsTimed.IsTimedLight(nodeid))
                 {
@@ -150,6 +165,7 @@ namespace KiwiManager
 
                     for (var j = 0; j < configuration.timedNodes[i][2]; j++)
                     {
+                        q_j = j;
                         var cfgstep = configuration.timedNodeSteps[timedStepCount];
 
                         timedNode.addStep(cfgstep[0]);
@@ -158,6 +174,7 @@ namespace KiwiManager
 
                         for (var k = 0; k < cfgstep[1]; k++)
                         {
+                            q_k = k;
                             step.lightLeft[k] = (RoadBaseAI.TrafficLightState)configuration.timedNodeStepSegments[timedStepSegmentCount][0];
                             step.lightMain[k] = (RoadBaseAI.TrafficLightState)configuration.timedNodeStepSegments[timedStepSegmentCount][1];
                             step.lightRight[k] = (RoadBaseAI.TrafficLightState)configuration.timedNodeStepSegments[timedStepSegmentCount][2];
@@ -165,9 +182,11 @@ namespace KiwiManager
 
                             timedStepSegmentCount++;
                         }
+                        q_k = -2;
 
                         timedStepCount++;
                     }
+                    q_j = -3;
 
                     if (Convert.ToBoolean(configuration.timedNodes[i][3]))
                     {
@@ -175,7 +194,23 @@ namespace KiwiManager
                     }
                 }
             }
+            } catch (Exception ex) {
+                Log.Error(ex.ToString());
+                Log.Warning("i: " + q_i);
+                Log.Warning("j: " + q_j);
+                Log.Warning("k: " + q_k);
+                Log.Warning("nodeid: " + q_nodeid);
+                Log.Warning("timedStepCount: " + timedStepCount);
+                Log.Warning("timedStepSegmentCount: " + timedStepSegmentCount);
+                Log.Warning("TimedTrafficSteps.num: " + TimedTrafficSteps.s_num);
+                Log.Warning("TimedTrafficSteps.nodeID: " + TimedTrafficSteps.s_nodeID);
+                Log.Warning("TimedTrafficSteps.segment: " + TimedTrafficSteps.s_segment);
+                Log.Warning("TimedTrafficSteps.node?: " + TimedTrafficSteps.s_node.HasValue);
+                Log.Warning("TimedTrafficSteps.segmentLight: " + TimedTrafficSteps.s_segmentLight);
+            }
+            }
 
+            Log.Message("got to traffic light flags");
             for (int index = 0, nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID)
             {
                 if (Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags != 0 &&
@@ -203,6 +238,7 @@ namespace KiwiManager
 
             string[] lanes = configuration.laneFlags.Split(',');
 
+            Log.Message("got to lanes");
             foreach (string lanespec in lanes)
             {
                 string[] split = lanespec.Split(':');

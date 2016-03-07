@@ -8,6 +8,12 @@ namespace KiwiManager
 {
     public class TimedTrafficSteps : ICloneable
     {
+        public static int s_num = -1;
+        public static ushort s_nodeID = 0;
+        public static ushort s_segment = 0;
+        public static NetNode? s_node = null;
+        public static ManualSegmentLight s_segmentLight = null;
+
         public ushort nodeID;
         public int numSteps;
         public uint frame;
@@ -21,26 +27,52 @@ namespace KiwiManager
 
         public TimedTrafficSteps(int num, ushort nodeID)
         {
+            s_num = num;
+            s_nodeID = nodeID;
             this.nodeID = nodeID;
             this.numSteps = num;
 
-            var node = TrafficLightTool.GetNetNode(nodeID);
+            NetNode node = TrafficLightTool.GetNetNode(nodeID);
+            s_node = node;
 
-            for (int s = 0; s < 8; s++)
+            for (int s = 0; s < 8; ++s)
             {
-                var segment = node.GetSegment(s);
-
+                ushort segment = node.GetSegment(s);
                 if (segment != 0)
                 {
-                    var segmentLight = TrafficLightsManual.GetSegmentLight(nodeID, segment);
-
                     segments.Add(segment);
+                }
+            }
+            try
+            {
+                foreach (ushort segment in segments)
+                {
+                    s_segment = segment;
+                    ManualSegmentLight segmentLight = TrafficLightsManual.GetSegmentLight(nodeID, segment);
+                    s_segmentLight = segmentLight;
+
                     lightMain.Add(segmentLight.GetLightMain());
                     lightLeft.Add(segmentLight.GetLightLeft());
                     lightRight.Add(segmentLight.GetLightRight());
                     lightPedestrian.Add(segmentLight.GetLightPedestrian());
+                    s_segmentLight = null;
                 }
             }
+            catch (NullReferenceException nre)
+            {
+                string s = "[";
+                foreach (ushort segment in segments)
+                {
+                    s += segment;
+                    s += ',';
+                }
+                s += "]";
+                Log.Error("null reference, " + s + " (trying to get " + s_segment + ")");
+                throw nre;
+            }
+            s_num = -1;
+            s_nodeID = 0;
+            s_node = null;
         }
 
         public RoadBaseAI.TrafficLightState getLight(int segment, int lightType)
