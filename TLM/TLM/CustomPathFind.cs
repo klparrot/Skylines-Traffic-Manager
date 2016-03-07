@@ -1046,7 +1046,7 @@ namespace KiwiManager
                 }
                 num6 = this.CalculateLaneSpeed(connectOffset, item.m_position.m_offset, ref instance.m_segments.m_buffer[(int)item.m_position.m_segment], lane);
             }
-            float num7 = instance.m_segments.m_buffer[(int)item.m_position.m_segment].m_averageLength;
+            float num7 = instance.m_lanes.m_buffer[item.m_laneID].m_length;
             if (!this.m_stablePath)
             {
                 Randomizer randomizer = new Randomizer(this.m_pathFindIndex << 16 | (uint)item.m_position.m_segment);
@@ -1122,13 +1122,13 @@ namespace KiwiManager
                 {
                     float num15 = this.CalculateLaneSpeed(this.m_startOffsetA, item2.m_position.m_offset, ref segment, lane2);
                     float num16 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetA)) * 0.003921569f;
-                    item2.m_comparisonValue += num16 * segment.m_averageLength / (num15 * this.m_maxLength);
+                    item2.m_comparisonValue += num16 * instance.m_lanes.m_buffer[laneID].m_length / (num15 * this.m_maxLength);
                 }
                 if (num2 == this.m_startLaneB)
                 {
                     float num17 = this.CalculateLaneSpeed(this.m_startOffsetB, item2.m_position.m_offset, ref segment, lane2);
                     float num18 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetB)) * 0.003921569f;
-                    item2.m_comparisonValue += num18 * segment.m_averageLength / (num17 * this.m_maxLength);
+                    item2.m_comparisonValue += num18 * instance.m_lanes.m_buffer[laneID].m_length / (num17 * this.m_maxLength);
                 }
                 if (!this.m_ignoreBlocked && (segment.m_flags & NetSegment.Flags.Blocked) != NetSegment.Flags.None && lane2.m_laneType == NetInfo.LaneType.Vehicle)
                 {
@@ -1217,8 +1217,8 @@ namespace KiwiManager
                 laneType = lane2.m_laneType;
                 num4 = this.CalculateLaneSpeed(connectOffset, item.m_position.m_offset, ref instance.m_segments.m_buffer[(int)item.m_position.m_segment], lane2);
             }
-            float averageLength = instance.m_segments.m_buffer[(int)item.m_position.m_segment].m_averageLength;
-            float num5 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * averageLength;
+            float laneLength = instance.m_lanes.m_buffer[item.m_laneID].m_length;
+            float num5 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * laneLength;
             float num6 = item.m_methodDistance + num5;
             float num7 = item.m_comparisonValue + num5 / (num4 * this.m_maxLength);
             Vector3 b = instance.m_lanes.m_buffer[item.m_laneID].CalculatePosition((float)connectOffset * 0.003921569f);
@@ -1251,13 +1251,13 @@ namespace KiwiManager
                             {
                                 float num10 = this.CalculateLaneSpeed(this.m_startOffsetA, item2.m_position.m_offset, ref segment, lane3);
                                 float num11 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetA)) * 0.003921569f;
-                                item2.m_comparisonValue += num11 * segment.m_averageLength / (num10 * this.m_maxLength);
+                                item2.m_comparisonValue += num11 * instance.m_lanes.m_buffer[lane].m_length / (num10 * this.m_maxLength);
                             }
                             if (lane == this.m_startLaneB)
                             {
                                 float num12 = this.CalculateLaneSpeed(this.m_startOffsetB, item2.m_position.m_offset, ref segment, lane3);
                                 float num13 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetB)) * 0.003921569f;
-                                item2.m_comparisonValue += num13 * segment.m_averageLength / (num12 * this.m_maxLength);
+                                item2.m_comparisonValue += num13 * instance.m_lanes.m_buffer[lane].m_length / (num12 * this.m_maxLength);
                             }
                             if ((segment.m_flags & NetSegment.Flags.Invert) != NetSegment.Flags.None)
                             {
@@ -1332,7 +1332,7 @@ namespace KiwiManager
                 num5 = lane.m_speedLimit;
                 num6 = this.CalculateLaneSpeed(connectOffset, item.m_position.m_offset, ref instance.m_segments.m_buffer[(int)item.m_position.m_segment], lane);
             }
-            float num7 = instance.m_segments.m_buffer[(int)item.m_position.m_segment].m_averageLength;
+            float num7 = instance.m_lanes.m_buffer[item.m_laneID].m_length;
             if (!this.m_stablePath)
             {
                 Randomizer randomizer = new Randomizer(this.m_pathFindIndex << 16 | (uint)item.m_position.m_segment);
@@ -1399,13 +1399,13 @@ namespace KiwiManager
                             {
                                 float num15 = this.CalculateLaneSpeed(this.m_startOffsetA, item2.m_position.m_offset, ref segment, lane2);
                                 float num16 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetA)) * 0.003921569f;
-                                item2.m_comparisonValue += num16 * segment.m_averageLength / (num15 * this.m_maxLength);
+                                item2.m_comparisonValue += num16 * instance.m_lanes.m_buffer[num2].m_length / (num15 * this.m_maxLength);
                             }
                             if (num2 == this.m_startLaneB)
                             {
                                 float num17 = this.CalculateLaneSpeed(this.m_startOffsetB, item2.m_position.m_offset, ref segment, lane2);
                                 float num18 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetB)) * 0.003921569f;
-                                item2.m_comparisonValue += num18 * segment.m_averageLength / (num17 * this.m_maxLength);
+                                item2.m_comparisonValue += num18 * instance.m_lanes.m_buffer[num2].m_length / (num17 * this.m_maxLength);
                             }
                             if (!this.m_ignoreBlocked && (segment.m_flags & NetSegment.Flags.Blocked) != NetSegment.Flags.None && lane2.m_laneType == NetInfo.LaneType.Vehicle)
                             {
@@ -1485,8 +1485,8 @@ namespace KiwiManager
                 laneType = lane2.m_laneType;
                 num4 = this.CalculateLaneSpeed(connectOffset, item.m_position.m_offset, ref instance.m_segments.m_buffer[(int)item.m_position.m_segment], lane2);
             }
-            float averageLength = instance.m_segments.m_buffer[(int)item.m_position.m_segment].m_averageLength;
-            float num5 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * averageLength;
+            float laneLength = instance.m_lanes.m_buffer[item.m_laneID].m_length;
+            float num5 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * laneLength;
             float num6 = item.m_methodDistance + num5;
             float num7 = item.m_comparisonValue + num5 / (num4 * this.m_maxLength);
             if (laneIndex < num)
@@ -1511,13 +1511,13 @@ namespace KiwiManager
                     {
                         float num8 = this.CalculateLaneSpeed(this.m_startOffsetA, item2.m_position.m_offset, ref segment, lane3);
                         float num9 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetA)) * 0.003921569f;
-                        item2.m_comparisonValue += num9 * segment.m_averageLength / (num8 * this.m_maxLength);
+                        item2.m_comparisonValue += num9 * instance.m_lanes.m_buffer[lane].m_length / (num8 * this.m_maxLength);
                     }
                     if (lane == this.m_startLaneB)
                     {
                         float num10 = this.CalculateLaneSpeed(this.m_startOffsetB, item2.m_position.m_offset, ref segment, lane3);
                         float num11 = (float)Mathf.Abs((int)(item2.m_position.m_offset - this.m_startOffsetB)) * 0.003921569f;
-                        item2.m_comparisonValue += num11 * segment.m_averageLength / (num10 * this.m_maxLength);
+                        item2.m_comparisonValue += num11 * instance.m_lanes.m_buffer[lane].m_length / (num10 * this.m_maxLength);
                     }
                     if ((segment.m_flags & NetSegment.Flags.Invert) != NetSegment.Flags.None)
                     {
