@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Reflection;
 using ColossalFramework;
 using ColossalFramework.UI;
 using UnityEngine;
@@ -64,6 +65,7 @@ namespace KiwiManager
         private static UIButton buttonClearTraffic;
         private static UIButton buttonToggleDespawn;
         private static UIButton buttonDumpSVG;
+        private static UIButton buttonDumpNM;
 
         public static TrafficLightTool trafficLightTool;
 
@@ -76,7 +78,8 @@ namespace KiwiManager
             this.backgroundSprite = "GenericPanel";
             this.color = new Color32(75, 75, 135, 255);
             this.width = 240;
-            this.height = !LoadingExtension.PathfinderIncompatibility ? 390 : 310;
+//            this.height = !LoadingExtension.PathfinderIncompatibility ? 390 : 310;
+            this.height = !LoadingExtension.PathfinderIncompatibility ? 430 : 350;
             this.relativePosition = new Vector3(80f, 50f);
 
             UILabel title = this.AddUIComponent<UILabel>();
@@ -97,6 +100,7 @@ namespace KiwiManager
                 buttonClearTraffic = _createButton("Clear Traffic", new Vector3(20f, 270f), clickClearTraffic);
                 buttonToggleDespawn = _createButton(LoadingExtension.Instance.despawnEnabled ? "Disable despawning" : "Enable despawning", new Vector3(20f, 310f), clickToggleDespawn);
                 buttonDumpSVG = _createButton("Export to SVG", new Vector3(20f, 350f), clickDumpSVG);
+                buttonDumpNM = _createButton("Dump NetManager", new Vector3(20f, 390f), clickDumpNM);
 
             }
             else
@@ -108,6 +112,7 @@ namespace KiwiManager
                 buttonCrosswalk = _createButton("Add/Remove Crosswalk", new Vector3(20f, 190f), clickCrosswalk);
                 buttonClearTraffic = _createButton("Clear Traffic", new Vector3(20f, 230f), clickClearTraffic);
                 buttonDumpSVG = _createButton("Export to SVG", new Vector3(20f, 270f), clickDumpSVG);
+                buttonDumpNM = _createButton("Dump NetManager", new Vector3(20f, 310f), clickDumpNM);
             }
         }
 
@@ -749,6 +754,135 @@ namespace KiwiManager
                     writer.WriteLine("\" class=\"{0}\" />", e.cssclass);
                 }
                 writer.Write("</svg>\n");
+            }
+        }
+        private void clickDumpNM(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            NetManager instance = Singleton<NetManager>.instance;
+            uint frame = Singleton<SimulationManager>.instance.m_currentFrameIndex;
+            using (StreamWriter writer = new StreamWriter("/Users/graydon/NetManager." + frame + ".m_nodes.dat"))
+            {
+                Array16<NetNode> nodes = instance.m_nodes;
+                uint unusedCount = (uint) nodes.GetType().GetField("m_unusedCount", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance).GetValue(nodes);
+                ushort[] unusedItems = (ushort[]) nodes.GetType().GetField("m_unusedItems", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance).GetValue(nodes);
+                bool[] missing = new bool[nodes.m_size];
+                for (uint i = 0; i < unusedCount; ++i)
+                {
+                    missing[unusedItems[i]] = true;
+                }
+                for (int i = 0; i < nodes.m_buffer.Length; ++i)
+                {
+                    if (missing[i])
+                    {
+                        continue;
+                    }
+                    writer.WriteLine("{0}n\t{1}s\t{2}s\t{3}s\t{4}s\t{5}s\t{6}s\t{7}s\t{8}s\t{9}l\t{10}o\t{11}L\t{12}x\t{13}z", i,
+                            nodes.m_buffer[i].m_segment0,
+                            nodes.m_buffer[i].m_segment1,
+                            nodes.m_buffer[i].m_segment2,
+                            nodes.m_buffer[i].m_segment3,
+                            nodes.m_buffer[i].m_segment4,
+                            nodes.m_buffer[i].m_segment5,
+                            nodes.m_buffer[i].m_segment6,
+                            nodes.m_buffer[i].m_segment7,
+                            nodes.m_buffer[i].m_nextLaneNode,
+                            nodes.m_buffer[i].m_laneOffset,
+                            nodes.m_buffer[i].m_lane,
+                            nodes.m_buffer[i].m_position.x,
+                            nodes.m_buffer[i].m_position.z);
+                }
+            }
+            using (StreamWriter writer = new StreamWriter("/Users/graydon/NetManager." + frame + ".m_segments.dat"))
+            {
+                Array16<NetSegment> segments = instance.m_segments;
+                uint unusedCount = (uint) segments.GetType().GetField("m_unusedCount", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance).GetValue(segments);
+                ushort[] unusedItems = (ushort[]) segments.GetType().GetField("m_unusedItems", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance).GetValue(segments);
+                bool[] missing = new bool[segments.m_size];
+                for (uint i = 0; i < unusedCount; ++i)
+                {
+                    missing[unusedItems[i]] = true;
+                }
+                for (int i = 0; i < segments.m_buffer.Length; ++i)
+                {
+                    if (missing[i])
+                    {
+                        continue;
+                    }
+                    writer.Write("{0}", i);
+                    //writer.Write("\tm_problems: {0}", segments.m_buffer[i].m_problems);
+                    //writer.Write("\tm_bounds: {0}", segments.m_buffer[i].m_bounds);
+                    //writer.Write("\tm_middlePosition: {0}", segments.m_buffer[i].m_middlePosition);
+                    writer.Write("\tm_startDirection: {0}", segments.m_buffer[i].m_startDirection);
+                    writer.Write("\tm_endDirection: {0}", segments.m_buffer[i].m_endDirection);
+                    writer.Write("\tm_flags: {0}", segments.m_buffer[i].m_flags);
+                    writer.Write("\tm_averageLength: {0}", segments.m_buffer[i].m_averageLength);
+                    //writer.Write("\tm_buildIndex: {0}", segments.m_buffer[i].m_buildIndex);
+                    //writer.Write("\tm_modifiedIndex: {0}", segments.m_buffer[i].m_modifiedIndex);
+                    writer.Write("\tm_lanes: {0}", segments.m_buffer[i].m_lanes);
+                    //writer.Write("\tm_path: {0}", segments.m_buffer[i].m_path);
+                    writer.Write("\tm_startNode: {0}", segments.m_buffer[i].m_startNode);
+                    writer.Write("\tm_endNode: {0}", segments.m_buffer[i].m_endNode);
+                    //writer.Write("\tm_blockStartLeft: {0}", segments.m_buffer[i].m_blockStartLeft);
+                    //writer.Write("\tm_blockStartRight: {0}", segments.m_buffer[i].m_blockStartRight);
+                    //writer.Write("\tm_blockEndLeft: {0}", segments.m_buffer[i].m_blockEndLeft);
+                    //writer.Write("\tm_blockEndRight: {0}", segments.m_buffer[i].m_blockEndRight);
+                    writer.Write("\tm_trafficBuffer: {0}", segments.m_buffer[i].m_trafficBuffer);
+                    writer.Write("\tm_startLeftSegment: {0}", segments.m_buffer[i].m_startLeftSegment);
+                    writer.Write("\tm_startRightSegment: {0}", segments.m_buffer[i].m_startRightSegment);
+                    writer.Write("\tm_endLeftSegment: {0}", segments.m_buffer[i].m_endLeftSegment);
+                    writer.Write("\tm_endRightSegment: {0}", segments.m_buffer[i].m_endRightSegment);
+                    //writer.Write("\tm_infoIndex: {0}", segments.m_buffer[i].m_infoIndex);
+                    //writer.Write("\tm_nextGridSegment: {0}", segments.m_buffer[i].m_nextGridSegment);
+                    writer.Write("\tm_trafficDensity: {0}", segments.m_buffer[i].m_trafficDensity);
+                    writer.Write("\tm_trafficLightState0: {0}", segments.m_buffer[i].m_trafficLightState0);
+                    writer.Write("\tm_trafficLightState1: {0}", segments.m_buffer[i].m_trafficLightState1);
+                    writer.Write("\tm_cornerAngleStart: {0}", segments.m_buffer[i].m_cornerAngleStart);
+                    writer.Write("\tm_cornerAngleEnd: {0}", segments.m_buffer[i].m_cornerAngleEnd);
+                    //writer.Write("\tm_fireCoverage: {0}", segments.m_buffer[i].m_fireCoverage);
+                    //writer.Write("\tm_wetness: {0}", segments.m_buffer[i].m_wetness);
+                    writer.Write("\tm_condition: {0}", segments.m_buffer[i].m_condition);
+                    writer.WriteLine();
+                }
+            }
+            using (StreamWriter writer = new StreamWriter("/Users/graydon/NetManager." + frame + ".m_lanes.dat"))
+            {
+              try
+              {
+                Array32<NetLane> lanes = instance.m_lanes;
+                uint unusedCount = (uint) lanes.GetType().GetField("m_unusedCount", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance).GetValue(lanes);
+                uint[] unusedItems = (uint[]) lanes.GetType().GetField("m_unusedItems", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance).GetValue(lanes);
+                bool[] missing = new bool[lanes.m_size];
+                for (uint i = 0; i < unusedCount; ++i)
+                {
+                    missing[unusedItems[i]] = true;
+                }
+                for (int i = 0; i < lanes.m_buffer.Length; ++i)
+                {
+                    if (missing[i])
+                    {
+                        continue;
+                    }
+                    writer.Write("{0}", i);
+                    writer.Write("\tm_bezier: {0}", lanes.m_buffer[i].m_bezier);
+                    writer.Write("\tm_length: {0}", lanes.m_buffer[i].m_length);
+                    writer.Write("\tm_curve: {0}", lanes.m_buffer[i].m_curve);
+                    writer.Write("\tm_nextLane: {0}", lanes.m_buffer[i].m_nextLane);
+                    writer.Write("\tm_flags: {0}", lanes.m_buffer[i].m_flags);
+                    writer.Write("\tm_segment: {0}", lanes.m_buffer[i].m_segment);
+                    writer.Write("\tm_nodes: {0}", lanes.m_buffer[i].m_nodes);
+                    //writer.Write("\tm_lastReserveID: {0}", lanes.m_buffer[i].m_lastReserveID);
+                    writer.Write("\tm_firstTarget: {0}", lanes.m_buffer[i].m_firstTarget);
+                    writer.Write("\tm_lastTarget: {0}", lanes.m_buffer[i].m_lastTarget);
+                    //writer.Write("\tm_reservedPrev: {0}", lanes.m_buffer[i].m_reservedPrev);
+                    //writer.Write("\tm_reservedNext: {0}", lanes.m_buffer[i].m_reservedNext);
+                    //writer.Write("\tm_reservedFrame: {0}", lanes.m_buffer[i].m_reservedFrame);
+                    writer.WriteLine();
+                }
+              }
+              catch (Exception ex)
+              {
+                  Log.Warning(ex.ToString());
+              }
             }
         }
 

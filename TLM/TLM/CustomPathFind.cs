@@ -218,8 +218,15 @@ namespace KiwiManager
         }
 
 
+        private static uint m_frame = 0;
         private void PathFindImplementation(uint unit, ref PathUnit data)
         {
+            //uint frame = Singleton<SimulationManager>.instance.m_currentFrameIndex;
+            //if (frame >> 8 != m_frame >> 8)
+            //{
+            //    m_frame = frame;
+            //    Log.Message("PathFindImplementation");
+            //}
             NetManager instance = Singleton<NetManager>.instance;
             this.m_laneTypes = (NetInfo.LaneType)this.m_pathUnits.m_buffer[unit].m_laneTypes;
             this.m_vehicleTypes = (VehicleInfo.VehicleType)this.m_pathUnits.m_buffer[unit].m_vehicleTypes;
@@ -1277,7 +1284,7 @@ namespace KiwiManager
             bool result = false;
             if ((segment.m_flags & (NetSegment.Flags.PathFailed | NetSegment.Flags.Flooded)) != NetSegment.Flags.None)
             {
-                return result;
+                return false;
             }
             NetManager instance = Singleton<NetManager>.instance;
             NetInfo info = segment.Info;
@@ -1310,7 +1317,7 @@ namespace KiwiManager
                 float num4 = vector.x * vector2.x + vector.z * vector2.z;
                 if (num4 >= num3)
                 {
-                    return result;
+                    return false;
                 }
             }
             float num5 = 1f;
