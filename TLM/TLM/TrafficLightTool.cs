@@ -630,8 +630,7 @@ namespace KiwiManager
         {
             var width = 8f;
 
-            ToolManager expr_EA_cp_0 = Singleton<ToolManager>.instance;
-            expr_EA_cp_0.m_drawCallData.m_overlayCalls = expr_EA_cp_0.m_drawCallData.m_overlayCalls + 1;
+            Singleton<ToolManager>.instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawBezier(cameraInfo, color, bezier,
                 width * 2f, width, width, -1f, 1280f, false, false);
 
@@ -640,8 +639,7 @@ namespace KiwiManager
 
         public void _renderOverlayDraw(RenderManager.CameraInfo cameraInfo, Color color, Vector3 position, float width, bool alpha)
         {
-            ToolManager expr_EA_cp_0 = Singleton<ToolManager>.instance;
-            expr_EA_cp_0.m_drawCallData.m_overlayCalls = expr_EA_cp_0.m_drawCallData.m_overlayCalls + 1;
+            Singleton<ToolManager>.instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawCircle(cameraInfo, color, position, width, position.y - 100f, position.y + 100f, false, alpha);
         }
 

@@ -185,9 +185,7 @@ namespace KiwiManager
                         }
                         this.m_queueLast = unit;
                     }
-                    PathUnit[] expr_BD_cp_0 = this.m_pathUnits.m_buffer;
-                    UIntPtr expr_BD_cp_1 = (UIntPtr)unit;
-                    expr_BD_cp_0[(int)expr_BD_cp_1].m_pathFindFlags = (byte)(expr_BD_cp_0[(int)expr_BD_cp_1].m_pathFindFlags | 1);
+                    this.m_pathUnits.m_buffer[unit].m_pathFindFlags = (byte) (this.m_pathUnits.m_buffer[unit].m_pathFindFlags | 1);
                     this.m_queuedPathFindCount++;
                     Monitor.Pulse(this.m_queueLock);
                 }
@@ -426,9 +424,7 @@ namespace KiwiManager
             }
             if (!flag)
             {
-                PathUnit[] expr_8D5_cp_0 = this.m_pathUnits.m_buffer;
-                UIntPtr expr_8D5_cp_1 = (UIntPtr)unit;
-                expr_8D5_cp_0[(int)expr_8D5_cp_1].m_pathFindFlags = (byte)(expr_8D5_cp_0[(int)expr_8D5_cp_1].m_pathFindFlags | 8);
+                this.m_pathUnits.m_buffer[unit].m_pathFindFlags = (byte) (this.m_pathUnits.m_buffer[unit].m_pathFindFlags | 8);
                 return;
             }
             float num8 = goalItem.m_comparisonValue * this.m_maxLength;
@@ -472,9 +468,7 @@ namespace KiwiManager
                             }
                         }
                     }
-                    PathUnit[] expr_BE2_cp_0 = this.m_pathUnits.m_buffer;
-                    UIntPtr expr_BE2_cp_1 = (UIntPtr)unit;
-                    expr_BE2_cp_0[(int)expr_BE2_cp_1].m_pathFindFlags = (byte)(expr_BE2_cp_0[(int)expr_BE2_cp_1].m_pathFindFlags | 4);
+                    this.m_pathUnits.m_buffer[unit].m_pathFindFlags = (byte) (this.m_pathUnits.m_buffer[unit].m_pathFindFlags | 4);
                     return;
                 }
                 if (num10 == 12)
@@ -488,9 +482,7 @@ namespace KiwiManager
                         Randomizer localRandom = this.m_pathRandomizer;
                         if (!this.m_pathUnits.CreateItem(out num13, ref localRandom))
                         {
-                            PathUnit[] expr_CE1_cp_0 = this.m_pathUnits.m_buffer;
-                            UIntPtr expr_CE1_cp_1 = (UIntPtr)unit;
-                            expr_CE1_cp_0[(int)expr_CE1_cp_1].m_pathFindFlags = (byte)(expr_CE1_cp_0[(int)expr_CE1_cp_1].m_pathFindFlags | 8);
+                            this.m_pathUnits.m_buffer[unit].m_pathFindFlags = (byte) (this.m_pathUnits.m_buffer[unit].m_pathFindFlags | 8);
                             return;
                         }
                         this.m_pathRandomizer = localRandom;
@@ -512,9 +504,7 @@ namespace KiwiManager
                 uint laneID = PathManager.GetLaneID(position);
                 position = this.m_laneTarget[laneID];
             }
-            PathUnit[] expr_D65_cp_0 = this.m_pathUnits.m_buffer;
-            UIntPtr expr_D65_cp_1 = (UIntPtr)unit;
-            expr_D65_cp_0[(int)expr_D65_cp_1].m_pathFindFlags = (byte)(expr_D65_cp_0[(int)expr_D65_cp_1].m_pathFindFlags | 8);
+            this.m_pathUnits.m_buffer[unit].m_pathFindFlags = (byte) (this.m_pathUnits.m_buffer[unit].m_pathFindFlags | 8);
         }
 
         private void ProcessItem1(CustomPathFind.BufferItem item, ushort nodeID, ref NetNode node, byte connectOffset, bool isMiddle, ref PathUnit data)
@@ -1670,9 +1660,7 @@ namespace KiwiManager
                     Debug.Log("path thread error: " + ex.Message);
                     UIView.ForwardException(ex);
                     CODebugBase<LogChannel>.Error(LogChannel.Core, "Path find error: " + ex.Message + "\n" + ex.StackTrace);
-                    PathUnit[] expr_1A0_cp_0 = this.m_pathUnits.m_buffer;
-                    UIntPtr expr_1A0_cp_1 = (UIntPtr)this.m_calculating;
-                    expr_1A0_cp_0[(int)expr_1A0_cp_1].m_pathFindFlags = (byte)(expr_1A0_cp_0[(int)expr_1A0_cp_1].m_pathFindFlags | 8);
+                    this.m_pathUnits.m_buffer[this.m_calculating].m_pathFindFlags = (byte) (this.m_pathUnits.m_buffer[this.m_calculating].m_pathFindFlags | 8);
                 }
                 while (!Monitor.TryEnter(this.m_queueLock, SimulationManager.SYNCHRONIZE_TIMEOUT))
                 {

@@ -81,27 +81,19 @@ namespace KiwiManager
             {
                 if (startPosA.m_segment != 0 && startPosB.m_segment != 0)
                 {
-                    NetNode[] expr_2D9_cp_0 = instance.m_nodes.m_buffer;
-                    ushort expr_2D9_cp_1 = data.m_startNode;
-                    expr_2D9_cp_0[(int)expr_2D9_cp_1].m_flags = (expr_2D9_cp_0[(int)expr_2D9_cp_1].m_flags | NetNode.Flags.Ambiguous);
+                    instance.m_nodes.m_buffer[data.m_startNode].m_flags |= NetNode.Flags.Ambiguous;
                 }
                 else
                 {
-                    NetNode[] expr_305_cp_0 = instance.m_nodes.m_buffer;
-                    ushort expr_305_cp_1 = data.m_startNode;
-                    expr_305_cp_0[(int)expr_305_cp_1].m_flags = (expr_305_cp_0[(int)expr_305_cp_1].m_flags & ~NetNode.Flags.Ambiguous);
+                    instance.m_nodes.m_buffer[data.m_startNode].m_flags &= ~NetNode.Flags.Ambiguous;
                 }
                 if (endPosA.m_segment != 0 && endPosB.m_segment != 0)
                 {
-                    NetNode[] expr_344_cp_0 = instance.m_nodes.m_buffer;
-                    ushort expr_344_cp_1 = data.m_endNode;
-                    expr_344_cp_0[(int)expr_344_cp_1].m_flags = (expr_344_cp_0[(int)expr_344_cp_1].m_flags | NetNode.Flags.Ambiguous);
+                    instance.m_nodes.m_buffer[data.m_endNode].m_flags |= NetNode.Flags.Ambiguous;
                 }
                 else
                 {
-                    NetNode[] expr_370_cp_0 = instance.m_nodes.m_buffer;
-                    ushort expr_370_cp_1 = data.m_endNode;
-                    expr_370_cp_0[(int)expr_370_cp_1].m_flags = (expr_370_cp_0[(int)expr_370_cp_1].m_flags & ~NetNode.Flags.Ambiguous);
+                    instance.m_nodes.m_buffer[data.m_endNode].m_flags &= ~NetNode.Flags.Ambiguous;
                 }
                 data.m_path = path;
                 data.m_flags |= NetSegment.Flags.WaitingPath;
