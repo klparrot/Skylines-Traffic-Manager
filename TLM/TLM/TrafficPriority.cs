@@ -7,96 +7,51 @@ using UnityEngine;
 
 namespace KiwiManager
 {
-    class TrafficSegment
-    {
-        public ushort node_1 = 0;
-        public ushort node_2 = 0;
-
-        public int segment = 0;
-
-        public PrioritySegment instance_1;
-        public PrioritySegment instance_2;
-    }
-
     class TrafficPriority
     {
         public static bool leftHandDrive;
 
-        public static Dictionary<int, TrafficSegment> prioritySegments = new Dictionary<int, TrafficSegment>();
+        public static Dictionary<uint, PrioritySegment> prioritySegments = new Dictionary<uint, PrioritySegment>();
 
         public static Dictionary<ushort, PriorityCar> vehicleList = new Dictionary<ushort, PriorityCar>();
 
-        public static void addPrioritySegment(ushort nodeID, int segmentID, PrioritySegment.PriorityType type)
+        private static uint getKey(ushort nodeID, ushort segmentID)
         {
-            if (prioritySegments.ContainsKey(segmentID))
+            if (nodeID != 0 && nodeID < NetManager.MAX_NODE_COUNT &&
+                segmentID != 0 && segmentID < NetManager.MAX_SEGMENT_COUNT)
             {
-                var prioritySegment = prioritySegments[segmentID];
-
-                prioritySegment.node_2 = nodeID;
-                prioritySegment.instance_2 = new PrioritySegment(nodeID, segmentID, type);
+                return (uint) ((nodeID << 16) | segmentID);
             }
             else
             {
-                prioritySegments.Add(segmentID, new TrafficSegment());
-                prioritySegments[segmentID].segment = segmentID;
-                prioritySegments[segmentID].node_1 = nodeID;
-                prioritySegments[segmentID].instance_1 = new PrioritySegment(nodeID, segmentID, type);
+                throw new IndexOutOfRangeException("node/segment ID " + nodeID + "/" + segmentID);
             }
         }
-
-        public static void removePrioritySegment(ushort nodeID, int segmentID)
+        public static void addPrioritySegment(ushort nodeID, ushort segmentID, PrioritySegment.PriorityType type)
         {
-            var prioritySegment = prioritySegments[segmentID];
-
-            if (prioritySegment.node_1 == nodeID)
-            {
-                prioritySegment.node_1 = 0;
-                prioritySegment.instance_1 = null;
-            }
-            else
-            {
-                prioritySegment.node_2 = 0;
-                prioritySegment.instance_2 = null;
-            }
-
-            if (prioritySegment.node_1 == 0 && prioritySegment.node_2 == 0)
-            {
-                prioritySegments.Remove(segmentID);
-            }
+            prioritySegments.Add(getKey(nodeID, segmentID), new PrioritySegment(nodeID, segmentID, type));
         }
 
-        public static bool isPrioritySegment(ushort nodeID, int segmentID)
+        public static void removePrioritySegment(ushort nodeID, ushort segmentID)
         {
-            if (prioritySegments.ContainsKey(segmentID))
-            {
-                var prioritySegment = prioritySegments[segmentID];
-
-                if (prioritySegment.node_1 == nodeID || prioritySegment.node_2 == nodeID)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            prioritySegments.Remove(getKey(nodeID, segmentID));
         }
 
-        public static PrioritySegment getPrioritySegment(ushort nodeID, int segmentID)
+        public static bool isPrioritySegment(ushort nodeID, ushort segmentID)
         {
-            if (prioritySegments.ContainsKey(segmentID))
+            return prioritySegments.ContainsKey(getKey(nodeID, segmentID));
+        }
+
+        public static PrioritySegment getPrioritySegment(ushort nodeID, ushort segmentID)
+        {
+            try
             {
-                var prioritySegment = prioritySegments[segmentID];
-
-                if (prioritySegment.node_1 == nodeID)
-                {
-                    return prioritySegment.instance_1;
-                }
-                if (prioritySegment.node_2 == nodeID)
-                {
-                    return prioritySegment.instance_2;
-                }
+                return prioritySegments[getKey(nodeID, segmentID)];
             }
-
-            return null;
+            catch (KeyNotFoundException knfe)
+            {
+                return null;
+            }
         }
 
         public static bool incomingVehicles(ushort targetCar, ushort nodeID)
@@ -613,10 +568,10 @@ namespace KiwiManager
         public int waitTime = 0;
 
         public ushort toNode;
-        public int fromSegment;
-        public int toSegment;
-        public uint toLaneID;
-        public uint fromLaneID;
+        public ushort fromSegment;
+        public ushort toSegment;
+        public ushort toLaneID;
+        public ushort fromLaneID;
         public ushort fromLaneFlags;
         public float lastSpeed;
         public float yieldSpeedReduce;

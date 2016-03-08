@@ -202,8 +202,8 @@ namespace KiwiManager
                             TrafficPriority.vehicleList[vehicleID].toNode = num2;
                             TrafficPriority.vehicleList[vehicleID].fromSegment = prevPos.m_segment;
                             TrafficPriority.vehicleList[vehicleID].toSegment = position.m_segment;
-                            TrafficPriority.vehicleList[vehicleID].toLaneID = PathManager.GetLaneID(position);
-                            TrafficPriority.vehicleList[vehicleID].fromLaneID = PathManager.GetLaneID(prevPos);
+                            TrafficPriority.vehicleList[vehicleID].toLaneID = (ushort) PathManager.GetLaneID(position);
+                            TrafficPriority.vehicleList[vehicleID].fromLaneID = (ushort) PathManager.GetLaneID(prevPos);
                             TrafficPriority.vehicleList[vehicleID].fromLaneFlags =
                                 instance.m_lanes.m_buffer[PathManager.GetLaneID(prevPos)].m_flags;
                             TrafficPriority.vehicleList[vehicleID].yieldSpeedReduce = UnityEngine.Random.Range(13f,

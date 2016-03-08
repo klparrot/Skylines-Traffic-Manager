@@ -69,18 +69,18 @@ namespace KiwiManager
     }
     class SegmentRestrictions
     {
-        private int segmentID;
+        private ushort segmentID;
 
         public float[] speedLimits = new float[16] {0f, 0f, 0f, 0f, 0f, 0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f};
 
         public List<LaneRestrictions> lanes = new List<LaneRestrictions>();
 
-        public List<int> segmentGroup; 
+        public List<ushort> segmentGroup;
 
-        public SegmentRestrictions(int segmentid, List<int> segmentGroup )
+        public SegmentRestrictions(ushort segmentid, List<ushort> segmentGroup)
         {
             this.segmentID = segmentid;
-            this.segmentGroup = new List<int>(segmentGroup);
+            this.segmentGroup = new List<ushort>(segmentGroup);
         }
 
         public void addLane(uint lane, int lanenum, NetInfo.Direction dir)
@@ -116,24 +116,24 @@ namespace KiwiManager
             Cargo
         }
 
-        public static Dictionary<int, SegmentRestrictions> segments = new Dictionary<int, SegmentRestrictions>();
+        public static Dictionary<ushort, SegmentRestrictions> segments = new Dictionary<ushort, SegmentRestrictions>();
 
-        public static void addSegment(int segmentid, List<int> segmentGroup)
+        public static void addSegment(ushort segmentid, List<ushort> segmentGroup)
         {
             segments.Add(segmentid, new SegmentRestrictions(segmentid, segmentGroup));
         }
 
-        public static void removeSegment(int segmentid)
+        public static void removeSegment(ushort segmentid)
         {
             segments.Remove(segmentid);
         }
 
-        public static SegmentRestrictions getSegment(int segmentid)
+        public static SegmentRestrictions getSegment(ushort segmentid)
         {
             return segments[segmentid];
         }
 
-        public static bool isSegment(int segmentid)
+        public static bool isSegment(ushort segmentid)
         {
             return segments.ContainsKey(segmentid);
         }

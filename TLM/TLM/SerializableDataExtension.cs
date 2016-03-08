@@ -83,21 +83,27 @@ namespace KiwiManager
                 return;
             }
 
-            var configuration = Configuration.Deserialize(filepath);
+            Configuration configuration = Configuration.Deserialize(filepath);
 
-            for (var i = 0; i < configuration.prioritySegments.Count; i++)
+            for (int i = 0; i < configuration.prioritySegments.Count; ++i)
             {
-                if (
-                    !TrafficPriority.isPrioritySegment((ushort)configuration.prioritySegments[i][0],
-                        configuration.prioritySegments[i][1]))
+                if (!TrafficPriority.isPrioritySegment(
+                        (ushort) configuration.prioritySegments[i][0],
+                        (ushort) configuration.prioritySegments[i][1]))
                 {
-                    TrafficPriority.addPrioritySegment((ushort)configuration.prioritySegments[i][0],
-                        configuration.prioritySegments[i][1],
-                        (PrioritySegment.PriorityType)configuration.prioritySegments[i][2]);
+                    TrafficPriority.addPrioritySegment(
+                        (ushort) configuration.prioritySegments[i][0],
+                        (ushort) configuration.prioritySegments[i][1],
+                        (PrioritySegment.PriorityType) configuration.prioritySegments[i][2]);
+                }
+                else
+                {
+                    Log.Warning(((ushort) configuration.prioritySegments[i][0]) + ">" + ((ushort) configuration.prioritySegments[i][1]) + ">" +
+                            " has already been added as a priority segment!");
                 }
             }
 
-            for (var i = 0; i < configuration.nodeDictionary.Count; i++)
+            for (int i = 0; i < configuration.nodeDictionary.Count; ++i)
             {
                 if (CustomRoadAI.GetNodeSimulation((ushort)configuration.nodeDictionary[i][0]) == null)
                 {
@@ -110,7 +116,7 @@ namespace KiwiManager
                 }
             }
 
-            for (var i = 0; i < configuration.manualSegments.Count; i++)
+            for (int i = 0; i < configuration.manualSegments.Count; ++i)
             {
                 var segmentData = configuration.manualSegments[i];
 
@@ -272,20 +278,17 @@ namespace KiwiManager
 
             Configuration configuration = new Configuration();
 
+            foreach (PrioritySegment priseg in TrafficPriority.prioritySegments.Values)
+            {
+                if (priseg.nodeid == Singleton<NetManager>.instance.m_segments.m_buffer[priseg.segmentid].m_startNode ||
+                    priseg.nodeid == Singleton<NetManager>.instance.m_segments.m_buffer[priseg.segmentid].m_endNode)
+                {
+                    configuration.prioritySegments.Add(new int[3] { priseg.nodeid, priseg.segmentid, (int) priseg.type });
+                }
+            }
+
             for (int segmentID = 0; segmentID < NetManager.MAX_SEGMENT_COUNT; ++segmentID)
             {
-                if (TrafficPriority.prioritySegments.ContainsKey(segmentID))
-                {
-                    if (TrafficPriority.prioritySegments[segmentID].node_1 != 0)
-                    {
-                        configuration.prioritySegments.Add(new int[3] { TrafficPriority.prioritySegments[segmentID].node_1, segmentID, (int)TrafficPriority.prioritySegments[segmentID].instance_1.type });
-                    } 
-                    if (TrafficPriority.prioritySegments[segmentID].node_2 != 0)
-                    {
-                        configuration.prioritySegments.Add(new int[3] { TrafficPriority.prioritySegments[segmentID].node_2, segmentID, (int)TrafficPriority.prioritySegments[segmentID].instance_2.type });
-                    }
-                }
-
                 if (CustomRoadAI.nodeDictionary.ContainsKey((ushort) segmentID))
                 {
                     var nodeDict = CustomRoadAI.nodeDictionary[(ushort)segmentID];
@@ -384,7 +387,8 @@ namespace KiwiManager
             for (int laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
             {
                 ushort segmentID = Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_segment;
-                if (TrafficPriority.prioritySegments.ContainsKey(segmentID))
+                if (TrafficPriority.isPrioritySegment(Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].m_startNode, segmentID) ||
+                    TrafficPriority.isPrioritySegment(Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].m_endNode, segmentID))
                 {
                     configuration.laneFlags += string.Format("{0}:{1}:{2}:{3},", laneID,
                             Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_flags,

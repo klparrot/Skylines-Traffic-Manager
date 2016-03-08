@@ -36,12 +36,12 @@ namespace KiwiManager
         private static ushort _selectedNetNodeIdx;
 //        private static ushort _lastHoveredNetNodeIdx;
 
-        private int _hoveredSegmentIdx;
-        private static int _selectedSegmentIdx;
+        private ushort _hoveredSegmentIdx;
+        private static ushort _selectedSegmentIdx;
 //        private static int _lastHoveredSegmentIdx;
 
         public static List<ushort> SelectedNodeIndexes = new List<ushort>();
-        public static List<int> SelectedSegmentIndexes = new List<int>(); 
+        public static List<ushort> SelectedSegmentIndexes = new List<ushort>();
 
         private int[] _hoveredButton = new int[2];
         private ushort _hoveredNode;
@@ -927,7 +927,7 @@ namespace KiwiManager
                                 {
                                     var restSegment = TrafficRoadRestrictions.getSegment(_hoveredSegmentIdx);
 
-                                    SelectedSegmentIndexes = new List<int>(restSegment.segmentGroup);
+                                    SelectedSegmentIndexes = new List<ushort>(restSegment.segmentGroup);
                                 }
                             }
                             else
@@ -3547,7 +3547,7 @@ namespace KiwiManager
             {
                 var node = GetNetNode(_selectedNetNodeIdx);
 
-                var segmentId = 0;
+                ushort segmentId = 0;
 
                 for (var i = 0; i < 8; i++)
                 {
@@ -3886,17 +3886,17 @@ namespace KiwiManager
             SelectedNodeIndexes.Remove(node);
         }
 
-        public static void addListSegment(int segment)
+        public static void addListSegment(ushort segment)
         {
             SelectedSegmentIndexes.Add(segment);
         }
 
-        public static bool containsListSegment(int segment)
+        public static bool containsListSegment(ushort segment)
         {
             return SelectedSegmentIndexes.Contains(segment);
         }
 
-        public static void removeListSegment(int segment)
+        public static void removeListSegment(ushort segment)
         {
             SelectedSegmentIndexes.Remove(segment);
         }
