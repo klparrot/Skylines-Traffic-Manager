@@ -492,9 +492,9 @@ namespace KiwiManager
                         "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
                         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\" >\n" +
 //                        "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"1080\" height=\"1080\" viewBox=\"-8640 -8640 17280 17280\">\n" +
-                        "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"1440\" height=\"960\" viewBox=\"-1920 -1920 5760 3840\">\n" +
+                        "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"1440\" height=\"1440\" viewBox=\"-1920 -1920 5760 5760\">\n" +
                         "<rect id=\"map\" x=\"-8640\" y=\"-8640\" width=\"17280\" height=\"17280\" style=\"stroke: none; fill: #EFD;\" />\n" +
-                        "<rect id=\"city\" x=\"-960\" y=\"-960\" width=\"3840\" height=\"1920\" style=\"stroke: none; fill: #EEE;\" />\n" +
+                        "<rect id=\"city\" x=\"-960\" y=\"-960\" width=\"3840\" height=\"3840\" style=\"stroke: none; fill: #EEE;\" />\n" +
                         "<style language=\"text/css\"> /* <![CDATA[ */\n" +
                         "path {\n" +
                         "    fill: none;\n" +
