@@ -107,7 +107,7 @@ namespace KiwiManager
             int num2 = 0;
             while (num2 < (int)pathPos.m_lane && num != 0u)
             {
-                num = instance.m_lanes.m_buffer[(int)((UIntPtr)num)].m_nextLane;
+                num = instance.m_lanes.m_buffer[num].m_nextLane;
                 num2++;
             }
             return num;
@@ -116,21 +116,21 @@ namespace KiwiManager
         private void assignPathProperties(uint unit, uint buildIndex, PathUnit.Position startPosA, PathUnit.Position startPosB, PathUnit.Position endPosA, PathUnit.Position endPosB, PathUnit.Position vehiclePosition, NetInfo.LaneType laneTypes, VehicleInfo.VehicleType vehicleTypes, float maxLength, byte simulationFlags)
         {
 
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_simulationFlags = simulationFlags;
+            this.m_pathUnits.m_buffer[unit].m_simulationFlags = simulationFlags;
 
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_pathFindFlags = 0;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_buildIndex = buildIndex;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_position00 = startPosA;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_position01 = endPosA;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_position02 = startPosB;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_position03 = endPosB;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_position11 = vehiclePosition;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_nextPathUnit = 0u;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_laneTypes = (byte)laneTypes;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_vehicleTypes = (byte)vehicleTypes;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_length = maxLength;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_positionCount = 20;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_referenceCount = 1;
+            this.m_pathUnits.m_buffer[unit].m_pathFindFlags = 0;
+            this.m_pathUnits.m_buffer[unit].m_buildIndex = buildIndex;
+            this.m_pathUnits.m_buffer[unit].m_position00 = startPosA;
+            this.m_pathUnits.m_buffer[unit].m_position01 = endPosA;
+            this.m_pathUnits.m_buffer[unit].m_position02 = startPosB;
+            this.m_pathUnits.m_buffer[unit].m_position03 = endPosB;
+            this.m_pathUnits.m_buffer[unit].m_position11 = vehiclePosition;
+            this.m_pathUnits.m_buffer[unit].m_nextPathUnit = 0u;
+            this.m_pathUnits.m_buffer[unit].m_laneTypes = (byte)laneTypes;
+            this.m_pathUnits.m_buffer[unit].m_vehicleTypes = (byte)vehicleTypes;
+            this.m_pathUnits.m_buffer[unit].m_length = maxLength;
+            this.m_pathUnits.m_buffer[unit].m_positionCount = 20;
+            this.m_pathUnits.m_buffer[unit].m_referenceCount = 1;
         }
 
         private bool findShortestPath(uint unit, bool skipQueue)

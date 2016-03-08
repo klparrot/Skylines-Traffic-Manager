@@ -325,7 +325,7 @@ namespace KiwiManager
                     oneWaySegment = false;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
@@ -345,7 +345,7 @@ namespace KiwiManager
                     rightLanePosition = info.m_lanes[num3].m_position;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
@@ -505,7 +505,7 @@ namespace KiwiManager
                     return true;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
@@ -538,7 +538,7 @@ namespace KiwiManager
                     return true;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
@@ -571,7 +571,7 @@ namespace KiwiManager
                     return true;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
@@ -726,7 +726,7 @@ namespace KiwiManager
                     }
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
         }

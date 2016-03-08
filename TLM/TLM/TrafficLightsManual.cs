@@ -286,7 +286,7 @@ namespace KiwiManager
                     isOneWay = false;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int) ((UIntPtr) num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
@@ -327,7 +327,7 @@ namespace KiwiManager
                     return isOneWay;
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 

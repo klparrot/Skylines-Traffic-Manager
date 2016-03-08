@@ -14,7 +14,7 @@ namespace KiwiManager
             if ((data.m_flags & Vehicle.Flags.WaitingPath) != Vehicle.Flags.None)
             {
                 PathManager instance = Singleton<PathManager>.instance;
-                byte pathFindFlags = instance.m_pathUnits.m_buffer[(int) ((UIntPtr) data.m_path)].m_pathFindFlags;
+                byte pathFindFlags = instance.m_pathUnits.m_buffer[data.m_path].m_pathFindFlags;
                 if ((pathFindFlags & PathUnit.FLAG_READY) != 0)
                 {
                     data.m_pathPositionIndex = 255;
@@ -90,10 +90,10 @@ namespace KiwiManager
             byte prevOffset, int index, out Vector3 pos, out Vector3 dir, out float maxSpeed)
         {
             NetManager instance = Singleton<NetManager>.instance;
-            instance.m_lanes.m_buffer[(int)((UIntPtr)laneID)].CalculatePositionAndDirection((float)offset * 0.003921569f, out pos, out dir);
+            instance.m_lanes.m_buffer[laneID].CalculatePositionAndDirection((float)offset * 0.003921569f, out pos, out dir);
             Vehicle.Frame lastFrameData = vehicleData.GetLastFrameData();
             Vector3 position2 = lastFrameData.m_position;
-            Vector3 b = instance.m_lanes.m_buffer[(int)((UIntPtr)prevLaneID)].CalculatePosition((float)prevOffset * 0.003921569f);
+            Vector3 b = instance.m_lanes.m_buffer[prevLaneID].CalculatePosition((float)prevOffset * 0.003921569f);
             float num = 0.5f * lastFrameData.m_velocity.sqrMagnitude / this.m_info.m_braking + this.m_info.m_generatedInfo.m_size.z * 0.5f;
 
             if (vehicleData.Info.m_vehicleType == VehicleInfo.VehicleType.Car)
@@ -140,16 +140,16 @@ namespace KiwiManager
 
                     NetNode.Flags flagsNode = instance.m_nodes.m_buffer[(int) num2].m_flags;
                     NetLane.Flags flagsLane =
-                        (NetLane.Flags) instance.m_lanes.m_buffer[(int) ((UIntPtr) prevLaneID)].m_flags;
+                        (NetLane.Flags) instance.m_lanes.m_buffer[prevLaneID].m_flags;
                     if ((flagsNode & (NetNode.Flags.Junction | NetNode.Flags.OneWayOut | NetNode.Flags.OneWayIn)) ==
                         NetNode.Flags.Junction && instance.m_nodes.m_buffer[(int) num2].CountSegments() != 2)
                     {
                         float len = vehicleData.CalculateTotalLength(vehicleID) + 2f;
-                        if (!instance.m_lanes.m_buffer[(int) ((UIntPtr) laneID)].CheckSpace(len))
+                        if (!instance.m_lanes.m_buffer[laneID].CheckSpace(len))
                         {
                             bool flag4 = false;
                             if (nextPosition.m_segment != 0 &&
-                                instance.m_lanes.m_buffer[(int) ((UIntPtr) laneID)].m_length < 30f)
+                                instance.m_lanes.m_buffer[laneID].m_length < 30f)
                             {
                                 NetNode.Flags flags3 = instance.m_nodes.m_buffer[(int) num3].m_flags;
                                 if ((flags3 &
@@ -159,7 +159,7 @@ namespace KiwiManager
                                     uint laneID2 = PathManager.GetLaneID(nextPosition);
                                     if (laneID2 != 0u)
                                     {
-                                        flag4 = instance.m_lanes.m_buffer[(int) ((UIntPtr) laneID2)].CheckSpace(len);
+                                        flag4 = instance.m_lanes.m_buffer[laneID2].CheckSpace(len);
                                     }
                                 }
                             }
@@ -437,7 +437,7 @@ namespace KiwiManager
                                             maxSpeed =
                                                 this.CalculateTargetSpeed(vehicleID, ref vehicleData,
                                                     info3.m_lanes[(int) position.m_lane].m_speedLimit,
-                                                    instance.m_lanes.m_buffer[(int) ((UIntPtr) laneID)].m_curve)*0.8f;
+                                                    instance.m_lanes.m_buffer[laneID].m_curve)*0.8f;
                                         }
                                         else
                                         {
@@ -472,7 +472,7 @@ namespace KiwiManager
                     }
                 }
 
-                maxSpeed = this.CalculateTargetSpeed(vehicleID, ref vehicleData, laneSpeedLimit, instance.m_lanes.m_buffer[(int)((UIntPtr)laneID)].m_curve);
+                maxSpeed = this.CalculateTargetSpeed(vehicleID, ref vehicleData, laneSpeedLimit, instance.m_lanes.m_buffer[laneID].m_curve);
             }
             else
             {
@@ -482,7 +482,7 @@ namespace KiwiManager
         public void CalculateSegmentPosition2(ushort vehicleID, ref Vehicle vehicleData, PathUnit.Position position, uint laneID, byte offset, out Vector3 pos, out Vector3 dir, out float maxSpeed)
         {
             NetManager instance = Singleton<NetManager>.instance;
-            instance.m_lanes.m_buffer[(int)((UIntPtr)laneID)].CalculatePositionAndDirection((float)offset * 0.003921569f, out pos, out dir);
+            instance.m_lanes.m_buffer[laneID].CalculatePositionAndDirection((float)offset * 0.003921569f, out pos, out dir);
             NetInfo info = instance.m_segments.m_buffer[(int)position.m_segment].Info;
             if (info.m_lanes != null && info.m_lanes.Length > (int)position.m_lane)
             {
@@ -498,7 +498,7 @@ namespace KiwiManager
                     }
                 }
 
-                maxSpeed = this.CalculateTargetSpeed(vehicleID, ref vehicleData, laneSpeedLimit, instance.m_lanes.m_buffer[(int)((UIntPtr)laneID)].m_curve);
+                maxSpeed = this.CalculateTargetSpeed(vehicleID, ref vehicleData, laneSpeedLimit, instance.m_lanes.m_buffer[laneID].m_curve);
             }
             else
             {

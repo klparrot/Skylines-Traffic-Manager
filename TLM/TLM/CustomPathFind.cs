@@ -169,7 +169,7 @@ namespace KiwiManager
                         }
                         else
                         {
-                            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_nextPathUnit = this.m_queueFirst;
+                            this.m_pathUnits.m_buffer[unit].m_nextPathUnit = this.m_queueFirst;
                         }
                         this.m_queueFirst = unit;
                     }
@@ -181,7 +181,7 @@ namespace KiwiManager
                         }
                         else
                         {
-                            this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_queueLast)].m_nextPathUnit = unit;
+                            this.m_pathUnits.m_buffer[this.m_queueLast].m_nextPathUnit = unit;
                         }
                         this.m_queueLast = unit;
                     }
@@ -223,19 +223,19 @@ namespace KiwiManager
         private void PathFindImplementation(uint unit, ref PathUnit data)
         {
             NetManager instance = Singleton<NetManager>.instance;
-            this.m_laneTypes = (NetInfo.LaneType)this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_laneTypes;
-            this.m_vehicleTypes = (VehicleInfo.VehicleType)this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_vehicleTypes;
-            this.m_maxLength = this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_length;
+            this.m_laneTypes = (NetInfo.LaneType)this.m_pathUnits.m_buffer[unit].m_laneTypes;
+            this.m_vehicleTypes = (VehicleInfo.VehicleType)this.m_pathUnits.m_buffer[unit].m_vehicleTypes;
+            this.m_maxLength = this.m_pathUnits.m_buffer[unit].m_length;
             this.m_pathFindIndex = (this.m_pathFindIndex + 1u & 32767u);
             this.m_pathRandomizer = new Randomizer(unit);
-            this.m_isHeavyVehicle = ((this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_simulationFlags & 16) != 0);
-            this.m_ignoreBlocked = ((this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_simulationFlags & 32) != 0);
-            this.m_stablePath = ((this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_simulationFlags & 64) != 0);
+            this.m_isHeavyVehicle = ((this.m_pathUnits.m_buffer[unit].m_simulationFlags & 16) != 0);
+            this.m_ignoreBlocked = ((this.m_pathUnits.m_buffer[unit].m_simulationFlags & 32) != 0);
+            this.m_stablePath = ((this.m_pathUnits.m_buffer[unit].m_simulationFlags & 64) != 0);
             //this.m_vehicleType =
-            //    TrafficRoadRestrictions.vehicleType(this.m_pathUnits.m_buffer[(int) ((UIntPtr) unit)].m_simulationFlags);
+            //    TrafficRoadRestrictions.vehicleType(this.m_pathUnits.m_buffer[unit].m_simulationFlags);
 
-            int num = (int)(this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_positionCount & 15);
-            int num2 = this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_positionCount >> 4;
+            int num = (int)(this.m_pathUnits.m_buffer[unit].m_positionCount & 15);
+            int num2 = this.m_pathUnits.m_buffer[unit].m_positionCount >> 4;
             CustomPathFind.BufferItem startPosA;
             if (data.m_position00.m_segment != 0 && num >= 1)
             {
@@ -393,7 +393,7 @@ namespace KiwiManager
                         this.ProcessItem1(currentItem, endNode, ref instance.m_nodes.m_buffer[(int)endNode], 255, false, ref data);
                     }
                     int num6 = 0;
-                    ushort num7 = instance.m_lanes.m_buffer[(int)((UIntPtr)currentItem.m_laneID)].m_nodes;
+                    ushort num7 = instance.m_lanes.m_buffer[currentItem.m_laneID].m_nodes;
                     if (num7 != 0)
                     {
                         ushort startNode2 = instance.m_segments.m_buffer[(int)currentItem.m_position.m_segment].m_startNode;
@@ -432,7 +432,7 @@ namespace KiwiManager
                 return;
             }
             float num8 = goalItem.m_comparisonValue * this.m_maxLength;
-            this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_length = num8;
+            this.m_pathUnits.m_buffer[unit].m_length = num8;
             uint num9 = unit;
             int num10 = 0;
             int num11 = 0;
@@ -443,28 +443,28 @@ namespace KiwiManager
                 {
                     PathUnit.Position position2 = position;
                     position2.m_offset = b;
-                    this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].SetPosition(num10++, position2);
+                    this.m_pathUnits.m_buffer[num9].SetPosition(num10++, position2);
                 }
-                this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].SetPosition(num10++, position);
-                position = this.m_laneTarget[(int)((UIntPtr)goalItem.m_laneID)];
+                this.m_pathUnits.m_buffer[num9].SetPosition(num10++, position);
+                position = this.m_laneTarget[goalItem.m_laneID];
             }
             for (int k = 0; k < 262144; k++)
             {
-                this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].SetPosition(num10++, position);
+                this.m_pathUnits.m_buffer[num9].SetPosition(num10++, position);
                 if ((position.m_segment == endPosA.m_position.m_segment && position.m_lane == endPosA.m_position.m_lane && position.m_offset == endPosA.m_position.m_offset) || (position.m_segment == endPosB.m_position.m_segment && position.m_lane == endPosB.m_position.m_lane && position.m_offset == endPosB.m_position.m_offset))
                 {
-                    this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].m_positionCount = (byte)num10;
+                    this.m_pathUnits.m_buffer[num9].m_positionCount = (byte)num10;
                     num11 += num10;
                     if (num11 != 0)
                     {
-                        num9 = this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_nextPathUnit;
-                        num10 = (int)this.m_pathUnits.m_buffer[(int)((UIntPtr)unit)].m_positionCount;
+                        num9 = this.m_pathUnits.m_buffer[unit].m_nextPathUnit;
+                        num10 = (int)this.m_pathUnits.m_buffer[unit].m_positionCount;
                         int num12 = 0;
                         while (num9 != 0u)
                         {
-                            this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].m_length = num8 * (float)(num11 - num10) / (float)num11;
-                            num10 += (int)this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].m_positionCount;
-                            num9 = this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].m_nextPathUnit;
+                            this.m_pathUnits.m_buffer[num9].m_length = num8 * (float)(num11 - num10) / (float)num11;
+                            num10 += (int)this.m_pathUnits.m_buffer[num9].m_positionCount;
+                            num9 = this.m_pathUnits.m_buffer[num9].m_nextPathUnit;
                             if (++num12 >= 262144)
                             {
                                 CODebugBase<LogChannel>.Error(LogChannel.Core, "Invalid list detected!\n" + Environment.StackTrace);
@@ -494,11 +494,11 @@ namespace KiwiManager
                             return;
                         }
                         this.m_pathRandomizer = localRandom;
-                        this.m_pathUnits.m_buffer[(int)((UIntPtr)num13)] = this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)];
-                        this.m_pathUnits.m_buffer[(int)((UIntPtr)num13)].m_referenceCount = 1;
-                        this.m_pathUnits.m_buffer[(int)((UIntPtr)num13)].m_pathFindFlags = 4;
-                        this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].m_nextPathUnit = num13;
-                        this.m_pathUnits.m_buffer[(int)((UIntPtr)num9)].m_positionCount = (byte)num10;
+                        this.m_pathUnits.m_buffer[num13] = this.m_pathUnits.m_buffer[num9];
+                        this.m_pathUnits.m_buffer[num13].m_referenceCount = 1;
+                        this.m_pathUnits.m_buffer[num13].m_pathFindFlags = 4;
+                        this.m_pathUnits.m_buffer[num9].m_nextPathUnit = num13;
+                        this.m_pathUnits.m_buffer[num9].m_positionCount = (byte)num10;
                         num11 += num10;
                         Singleton<PathManager>.instance.m_pathUnitCount = (int)(this.m_pathUnits.ItemCount() - 1u);
                     }
@@ -510,7 +510,7 @@ namespace KiwiManager
                     num10 = 0;
                 }
                 uint laneID = PathManager.GetLaneID(position);
-                position = this.m_laneTarget[(int)((UIntPtr)laneID)];
+                position = this.m_laneTarget[laneID];
             }
             PathUnit[] expr_D65_cp_0 = this.m_pathUnits.m_buffer;
             UIntPtr expr_D65_cp_1 = (UIntPtr)unit;
@@ -764,7 +764,7 @@ namespace KiwiManager
                                 }
                             }
 
-                            segmentLanes = instance.m_lanes.m_buffer[(int)((UIntPtr)segmentLanes)].m_nextLane;
+                            segmentLanes = instance.m_lanes.m_buffer[segmentLanes].m_nextLane;
                             infoLanes++;
                         }
 
@@ -977,7 +977,7 @@ namespace KiwiManager
             if (node.m_lane != 0u)
             {
                 bool targetDisabled = (node.m_flags & NetNode.Flags.Disabled) != NetNode.Flags.None;
-                ushort segment4 = instance.m_lanes.m_buffer[(int)((UIntPtr)node.m_lane)].m_segment;
+                ushort segment4 = instance.m_lanes.m_buffer[node.m_lane].m_segment;
                 if (segment4 != 0 && segment4 != item.m_position.m_segment)
                 {
                     this.ProcessItem3(item, nodeID, targetDisabled, segment4, ref instance.m_segments.m_buffer[(int)segment4], node.m_lane, node.m_laneOffset, connectOffset);
@@ -1068,7 +1068,7 @@ namespace KiwiManager
             float num8 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * num7;
             float num9 = item.m_methodDistance + num8;
             float num10 = item.m_comparisonValue + num8 / (num6 * this.m_maxLength);
-            Vector3 b = instance.m_lanes.m_buffer[(int)((UIntPtr)item.m_laneID)].CalculatePosition((float)connectOffset * 0.003921569f);
+            Vector3 b = instance.m_lanes.m_buffer[item.m_laneID].CalculatePosition((float)connectOffset * 0.003921569f);
             int num11 = laneNum;
             bool flag = (instance.m_nodes.m_buffer[(int)targetNode].m_flags & NetNode.Flags.Transition) != NetNode.Flags.None;
             NetInfo.LaneType laneType2 = this.m_laneTypes;
@@ -1086,9 +1086,9 @@ namespace KiwiManager
 
             var speedLimit = lane2.m_speedLimit;
 
-            if (TrafficRoadRestrictions.isSegment(instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_segment))
+            if (TrafficRoadRestrictions.isSegment(instance.m_lanes.m_buffer[num2].m_segment))
             {
-                var restrictionSegment = TrafficRoadRestrictions.getSegment(instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_segment);
+                var restrictionSegment = TrafficRoadRestrictions.getSegment(instance.m_lanes.m_buffer[num2].m_segment);
 
                 if (restrictionSegment.speedLimits[(int)item.m_position.m_lane] > 0.1f)
                 {
@@ -1101,11 +1101,11 @@ namespace KiwiManager
                 Vector3 a;
                 if ((byte)(direction & NetInfo.Direction.Forward) != 0)
                 {
-                    a = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_bezier.d;
+                    a = instance.m_lanes.m_buffer[num2].m_bezier.d;
                 }
                 else
                 {
-                    a = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_bezier.a;
+                    a = instance.m_lanes.m_buffer[num2].m_bezier.a;
                 }
                 float num13 = Vector3.Distance(a, b);
                 if (flag)
@@ -1149,8 +1149,8 @@ namespace KiwiManager
                 item2.m_laneID = laneID;
                 if (lane2.m_laneType == laneType && lane2.m_vehicleType == vehicleType)
                 {
-                    int firstTarget = (int)instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_firstTarget;
-                    int lastTarget = (int)instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_lastTarget;
+                    int firstTarget = (int)instance.m_lanes.m_buffer[num2].m_firstTarget;
+                    int lastTarget = (int)instance.m_lanes.m_buffer[num2].m_lastTarget;
                     if (currentTargetIndex < firstTarget || currentTargetIndex >= lastTarget)
                     {
                         item2.m_comparisonValue += Mathf.Max(1f, num13 * 3f - 3f) / ((num5 + lane2.m_speedLimit) * 0.5f * this.m_maxLength);
@@ -1230,7 +1230,7 @@ namespace KiwiManager
             float num5 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * averageLength;
             float num6 = item.m_methodDistance + num5;
             float num7 = item.m_comparisonValue + num5 / (num4 * this.m_maxLength);
-            Vector3 b = instance.m_lanes.m_buffer[(int)((UIntPtr)item.m_laneID)].CalculatePosition((float)connectOffset * 0.003921569f);
+            Vector3 b = instance.m_lanes.m_buffer[item.m_laneID].CalculatePosition((float)connectOffset * 0.003921569f);
             int num8 = 0;
             while (num8 < num && num2 != 0u)
             {
@@ -1239,7 +1239,7 @@ namespace KiwiManager
                     NetInfo.Lane lane3 = info.m_lanes[num8];
                     if (lane3.CheckType(this.m_laneTypes, this.m_vehicleTypes))
                     {
-                        Vector3 a = instance.m_lanes.m_buffer[(int)((UIntPtr)lane)].CalculatePosition((float)offset * 0.003921569f);
+                        Vector3 a = instance.m_lanes.m_buffer[lane].CalculatePosition((float)offset * 0.003921569f);
                         float num9 = Vector3.Distance(a, b);
                         CustomPathFind.BufferItem item2;
                         item2.m_position.m_segment = segmentID;
@@ -1283,7 +1283,7 @@ namespace KiwiManager
                     }
                     return;
                 }
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num8++;
             }
         }
@@ -1354,7 +1354,7 @@ namespace KiwiManager
             float num8 = (float)Mathf.Abs((int)(connectOffset - item.m_position.m_offset)) * 0.003921569f * num7;
             float num9 = item.m_methodDistance + num8;
             float num10 = item.m_comparisonValue + num8 / (num6 * this.m_maxLength);
-            Vector3 b = instance.m_lanes.m_buffer[(int)((UIntPtr)item.m_laneID)].CalculatePosition((float)connectOffset * 0.003921569f);
+            Vector3 b = instance.m_lanes.m_buffer[item.m_laneID].CalculatePosition((float)connectOffset * 0.003921569f);
             int num11 = currentTargetIndex;
             bool flag = (instance.m_nodes.m_buffer[(int)targetNode].m_flags & NetNode.Flags.Transition) != NetNode.Flags.None;
             NetInfo.LaneType laneType2 = this.m_laneTypes;
@@ -1377,11 +1377,11 @@ namespace KiwiManager
                         Vector3 a;
                         if ((byte)(direction & NetInfo.Direction.Forward) != 0)
                         {
-                            a = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_bezier.d;
+                            a = instance.m_lanes.m_buffer[num2].m_bezier.d;
                         }
                         else
                         {
-                            a = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_bezier.a;
+                            a = instance.m_lanes.m_buffer[num2].m_bezier.a;
                         }
                         float num13 = Vector3.Distance(a, b);
                         if (flag)
@@ -1426,8 +1426,8 @@ namespace KiwiManager
                             item2.m_laneID = num2;
                             if (lane2.m_laneType == laneType && lane2.m_vehicleType == vehicleType)
                             {
-                                int firstTarget = (int)instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_firstTarget;
-                                int lastTarget = (int)instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_lastTarget;
+                                int firstTarget = (int)instance.m_lanes.m_buffer[num2].m_firstTarget;
+                                int lastTarget = (int)instance.m_lanes.m_buffer[num2].m_lastTarget;
                                 if (currentTargetIndex < firstTarget || currentTargetIndex >= lastTarget)
                                 {
                                     item2.m_comparisonValue += Mathf.Max(1f, num13 * 3f - 3f) / ((num5 + lane2.m_speedLimit) * 0.5f * this.m_maxLength);
@@ -1442,7 +1442,7 @@ namespace KiwiManager
                 {
                     num11++;
                 }
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num12++;
             }
             currentTargetIndex = num11;
@@ -1463,23 +1463,23 @@ namespace KiwiManager
             byte offset;
             if (segmentID == item.m_position.m_segment)
             {
-                Vector3 b = instance.m_lanes.m_buffer[(int)((UIntPtr)item.m_laneID)].CalculatePosition((float)connectOffset * 0.003921569f);
-                Vector3 a = instance.m_lanes.m_buffer[(int)((UIntPtr)lane)].CalculatePosition((float)connectOffset * 0.003921569f);
+                Vector3 b = instance.m_lanes.m_buffer[item.m_laneID].CalculatePosition((float)connectOffset * 0.003921569f);
+                Vector3 a = instance.m_lanes.m_buffer[lane].CalculatePosition((float)connectOffset * 0.003921569f);
                 num2 = Vector3.Distance(a, b);
                 offset = connectOffset;
             }
             else
             {
                 NetInfo.Direction direction = (targetNode != segment.m_startNode) ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
-                Vector3 b2 = instance.m_lanes.m_buffer[(int)((UIntPtr)item.m_laneID)].CalculatePosition((float)connectOffset * 0.003921569f);
+                Vector3 b2 = instance.m_lanes.m_buffer[item.m_laneID].CalculatePosition((float)connectOffset * 0.003921569f);
                 Vector3 a2;
                 if ((byte)(direction & NetInfo.Direction.Forward) != 0)
                 {
-                    a2 = instance.m_lanes.m_buffer[(int)((UIntPtr)lane)].m_bezier.d;
+                    a2 = instance.m_lanes.m_buffer[lane].m_bezier.d;
                 }
                 else
                 {
-                    a2 = instance.m_lanes.m_buffer[(int)((UIntPtr)lane)].m_bezier.a;
+                    a2 = instance.m_lanes.m_buffer[lane].m_bezier.a;
                 }
                 num2 = Vector3.Distance(a2, b2);
                 offset = (byte)(((byte)(direction & NetInfo.Direction.Forward) == 0) ? 0 : 255);
@@ -1545,7 +1545,7 @@ namespace KiwiManager
 
         private void AddBufferItem(CustomPathFind.BufferItem item, PathUnit.Position target)
         {
-            uint num = this.m_laneLocation[(int)((UIntPtr)item.m_laneID)];
+            uint num = this.m_laneLocation[item.m_laneID];
             uint num2 = num >> 16;
             int num3 = (int)(num & 65535u);
             int num6;
@@ -1565,12 +1565,12 @@ namespace KiwiManager
                 if (num6 == num4)
                 {
                     this.m_buffer[num3] = item;
-                    this.m_laneTarget[(int)((UIntPtr)item.m_laneID)] = target;
+                    this.m_laneTarget[item.m_laneID] = target;
                     return;
                 }
                 int num7 = num4 << 6 | this.m_bufferMax[num4]--;
                 CustomPathFind.BufferItem bufferItem = this.m_buffer[num7];
-                this.m_laneLocation[(int)((UIntPtr)bufferItem.m_laneID)] = num;
+                this.m_laneLocation[bufferItem.m_laneID] = num;
                 this.m_buffer[num3] = bufferItem;
             }
             else
@@ -1595,8 +1595,8 @@ namespace KiwiManager
             }
             num3 = (num6 << 6 | ++this.m_bufferMax[num6]);
             this.m_buffer[num3] = item;
-            this.m_laneLocation[(int)((UIntPtr)item.m_laneID)] = (this.m_pathFindIndex << 16 | (uint)num3);
-            this.m_laneTarget[(int)((UIntPtr)item.m_laneID)] = target;
+            this.m_laneLocation[item.m_laneID] = (this.m_pathFindIndex << 16 | (uint)num3);
+            this.m_laneTarget[item.m_laneID] = target;
         }
         private void GetLaneDirection(PathUnit.Position pathPos, out NetInfo.Direction direction, out NetInfo.LaneType type)
         {
@@ -1636,7 +1636,7 @@ namespace KiwiManager
                         break;
                     }
                     this.m_calculating = this.m_queueFirst;
-                    this.m_queueFirst = this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)].m_nextPathUnit;
+                    this.m_queueFirst = this.m_pathUnits.m_buffer[this.m_calculating].m_nextPathUnit;
                     if (this.m_queueFirst == 0u)
                     {
                         this.m_queueLast = 0u;
@@ -1646,8 +1646,8 @@ namespace KiwiManager
                     {
                         this.m_queuedPathFindCount--;
                     }
-                    this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)].m_nextPathUnit = 0u;
-                    this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)].m_pathFindFlags = (byte)(((int)this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)].m_pathFindFlags & -2) | 2);
+                    this.m_pathUnits.m_buffer[this.m_calculating].m_nextPathUnit = 0u;
+                    this.m_pathUnits.m_buffer[this.m_calculating].m_pathFindFlags = (byte)(((int)this.m_pathUnits.m_buffer[this.m_calculating].m_pathFindFlags & -2) | 2);
                 }
                 finally
                 {
@@ -1658,7 +1658,7 @@ namespace KiwiManager
                     this.m_pathfindProfiler.BeginStep();
                     try
                     {
-                        this.PathFindImplementation(this.m_calculating, ref this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)]);
+                        this.PathFindImplementation(this.m_calculating, ref this.m_pathUnits.m_buffer[this.m_calculating]);
                     }
                     finally
                     {
@@ -1679,7 +1679,7 @@ namespace KiwiManager
                 }
                 try
                 {
-                    this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)].m_pathFindFlags = (byte)((int)this.m_pathUnits.m_buffer[(int)((UIntPtr)this.m_calculating)].m_pathFindFlags & -3);
+                    this.m_pathUnits.m_buffer[this.m_calculating].m_pathFindFlags = (byte)((int)this.m_pathUnits.m_buffer[this.m_calculating].m_pathFindFlags & -3);
                     Singleton<PathManager>.instance.ReleasePath(this.m_calculating);
                     this.m_calculating = 0u;
                     Monitor.Pulse(this.m_queueLock);

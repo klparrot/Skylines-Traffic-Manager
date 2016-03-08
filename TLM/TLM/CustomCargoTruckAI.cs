@@ -55,7 +55,7 @@ namespace KiwiManager
             if ((data.m_flags & Vehicle.Flags.WaitingPath) != Vehicle.Flags.None)
             {
                 PathManager instance = Singleton<PathManager>.instance;
-                byte pathFindFlags = instance.m_pathUnits.m_buffer[(int)((UIntPtr)data.m_path)].m_pathFindFlags;
+                byte pathFindFlags = instance.m_pathUnits.m_buffer[data.m_path].m_pathFindFlags;
                 if ((pathFindFlags & 4) != 0)
                 {
                     data.m_pathPositionIndex = 255;

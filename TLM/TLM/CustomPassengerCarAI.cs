@@ -69,13 +69,13 @@ namespace KiwiManager
             int num2 = 0;
             while (num != 0u)
             {
-                uint nextUnit = instance.m_units.m_buffer[(int)((UIntPtr)num)].m_nextUnit;
+                uint nextUnit = instance.m_units.m_buffer[num].m_nextUnit;
                 for (int i = 0; i < 5; i++)
                 {
-                    uint citizen = instance.m_units.m_buffer[(int)((UIntPtr)num)].GetCitizen(i);
+                    uint citizen = instance.m_units.m_buffer[num].GetCitizen(i);
                     if (citizen != 0u)
                     {
-                        ushort instance2 = instance.m_citizens.m_buffer[(int)((UIntPtr)citizen)].m_instance;
+                        ushort instance2 = instance.m_citizens.m_buffer[citizen].m_instance;
                         if (instance2 != 0)
                         {
                             return instance2;

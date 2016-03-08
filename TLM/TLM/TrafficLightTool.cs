@@ -2506,7 +2506,7 @@ namespace KiwiManager
                         numLanes++;
                     }
 
-                    num2 = Singleton<NetManager>.instance.m_lanes.m_buffer[(int) ((UIntPtr) num2)].m_nextLane;
+                    num2 = Singleton<NetManager>.instance.m_lanes.m_buffer[num2].m_nextLane;
                     num3++;
                 }
 
@@ -2821,7 +2821,7 @@ namespace KiwiManager
                 }
 
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
             }
 
             var style = new GUIStyle();
@@ -2883,7 +2883,7 @@ namespace KiwiManager
                                 laneList0.Add(new float[3] { num20, info0.m_lanes[num30].m_position, num30});
                             }
 
-                            num20 = instance0.m_lanes.m_buffer[(int)((UIntPtr)num20)].m_nextLane;
+                            num20 = instance0.m_lanes.m_buffer[num20].m_nextLane;
                             num30++;
                         }
 
@@ -2963,7 +2963,7 @@ namespace KiwiManager
                     laneList.Add(new float[3] {num2, info2.m_lanes[num3].m_position, num3});
                 }
 
-                num2 = instance.m_lanes.m_buffer[(int)((UIntPtr)num2)].m_nextLane;
+                num2 = instance.m_lanes.m_buffer[num2].m_nextLane;
                 num3++;
             }
 
