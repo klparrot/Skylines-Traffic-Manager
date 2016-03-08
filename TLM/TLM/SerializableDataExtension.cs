@@ -176,45 +176,28 @@ namespace KiwiManager
                 }
             }
 
-            var j1 = 0;
-            for (var i1 = 0; i1 < 32768; i1++)
+            for (int index = 0, nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID)
             {
-                if (Singleton<NetManager>.instance.m_nodes.m_buffer[i1].Info.m_class.m_service ==
-                    ItemClass.Service.Road && Singleton<NetManager>.instance.m_nodes.m_buffer[i1].m_flags != 0)
+                if (Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags != 0 &&
+                    Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].Info.m_class.m_service == ItemClass.Service.Road)
                 {
-                    var trafficLight = configuration.nodeTrafficLights[j1];
-
-                    if (trafficLight == '1')
+                    if (configuration.nodeTrafficLights[index] == '1')
                     {
-                        Singleton<NetManager>.instance.m_nodes.m_buffer[i1].m_flags |= NetNode.Flags.TrafficLights;
+                        Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags |= NetNode.Flags.TrafficLights;
                     }
                     else
                     {
-                        Singleton<NetManager>.instance.m_nodes.m_buffer[i1].m_flags &= ~NetNode.Flags.TrafficLights;
+                        Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags &= ~NetNode.Flags.TrafficLights;
                     }
-
-                    j1++;
-                }
-            }
-
-            var j2 = 0;
-            for (var i2 = 0; i2 < 32768; i2++)
-            {
-                if (Singleton<NetManager>.instance.m_nodes.m_buffer[i2].Info.m_class.m_service ==
-                    ItemClass.Service.Road && Singleton<NetManager>.instance.m_nodes.m_buffer[i2].m_flags != 0)
-                {
-                    var crossWalk = configuration.nodeCrosswalk[j2];
-
-                    if (crossWalk == '1')
+                    if (configuration.nodeCrosswalk[index] == '1')
                     {
-                        Singleton<NetManager>.instance.m_nodes.m_buffer[i2].m_flags |= NetNode.Flags.Junction;
+                        Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags |= NetNode.Flags.Junction;
                     }
                     else
                     {
-                        Singleton<NetManager>.instance.m_nodes.m_buffer[i2].m_flags &= ~NetNode.Flags.Junction;
+                        Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags &= ~NetNode.Flags.Junction;
                     }
-
-                    j2++;
+                    ++index;
                 }
             }
 
@@ -249,36 +232,36 @@ namespace KiwiManager
             byte[] dataToSave = data.ToArray();
             SerializableData.SaveData(dataID, dataToSave);
 
-            var filepath = Path.Combine(Application.dataPath, "kiwiManagerSave_" + uniqueID + ".xml");
+            string filepath = Path.Combine(Application.dataPath, "kiwiManagerSave_" + uniqueID + ".xml");
 
-            var configuration = new Configuration();
+            Configuration configuration = new Configuration();
 
-            for (var i = 0; i < 32768; i++)
+            for (int segmentID = 0; segmentID < NetManager.MAX_SEGMENT_COUNT; ++segmentID)
             {
-                if (TrafficPriority.prioritySegments.ContainsKey(i))
+                if (TrafficPriority.prioritySegments.ContainsKey(segmentID))
                 {
-                    if (TrafficPriority.prioritySegments[i].node_1 != 0)
+                    if (TrafficPriority.prioritySegments[segmentID].node_1 != 0)
                     {
-                        configuration.prioritySegments.Add(new int[3] { TrafficPriority.prioritySegments[i].node_1, i, (int)TrafficPriority.prioritySegments[i].instance_1.type });
+                        configuration.prioritySegments.Add(new int[3] { TrafficPriority.prioritySegments[segmentID].node_1, segmentID, (int)TrafficPriority.prioritySegments[segmentID].instance_1.type });
                     } 
-                    if (TrafficPriority.prioritySegments[i].node_2 != 0)
+                    if (TrafficPriority.prioritySegments[segmentID].node_2 != 0)
                     {
-                        configuration.prioritySegments.Add(new int[3] { TrafficPriority.prioritySegments[i].node_2, i, (int)TrafficPriority.prioritySegments[i].instance_2.type });
+                        configuration.prioritySegments.Add(new int[3] { TrafficPriority.prioritySegments[segmentID].node_2, segmentID, (int)TrafficPriority.prioritySegments[segmentID].instance_2.type });
                     }
                 }
 
-                if (CustomRoadAI.nodeDictionary.ContainsKey((ushort) i))
+                if (CustomRoadAI.nodeDictionary.ContainsKey((ushort) segmentID))
                 {
-                    var nodeDict = CustomRoadAI.nodeDictionary[(ushort)i];
+                    var nodeDict = CustomRoadAI.nodeDictionary[(ushort)segmentID];
 
                     configuration.nodeDictionary.Add(new int[4] {nodeDict.NodeId, Convert.ToInt32(nodeDict._manualTrafficLights), Convert.ToInt32(nodeDict._timedTrafficLights), Convert.ToInt32(nodeDict.TimedTrafficLightsActive)});
                 }
 
-                if (TrafficLightsManual.ManualSegments.ContainsKey(i))
+                if (TrafficLightsManual.ManualSegments.ContainsKey(segmentID))
                 {
-                    if (TrafficLightsManual.ManualSegments[i].node_1 != 0)
+                    if (TrafficLightsManual.ManualSegments[segmentID].node_1 != 0)
                     {
-                        var manualSegment = TrafficLightsManual.ManualSegments[i].instance_1;
+                        ManualSegmentLight manualSegment = TrafficLightsManual.ManualSegments[segmentID].instance_1;
 
                         configuration.manualSegments.Add(new int[10]
                         {
@@ -294,9 +277,9 @@ namespace KiwiManager
                             Convert.ToInt32(manualSegment.pedestrianEnabled)
                         });
                     }
-                    if (TrafficLightsManual.ManualSegments[i].node_2 != 0)
+                    if (TrafficLightsManual.ManualSegments[segmentID].node_2 != 0)
                     {
-                        var manualSegment = TrafficLightsManual.ManualSegments[i].instance_2;
+                        ManualSegmentLight manualSegment = TrafficLightsManual.ManualSegments[segmentID].instance_2;
 
                         configuration.manualSegments.Add(new int[10]
                         {
@@ -314,9 +297,9 @@ namespace KiwiManager
                     }
                 }
 
-                if (TrafficLightsTimed.timedScripts.ContainsKey((ushort)i))
+                if (TrafficLightsTimed.timedScripts.ContainsKey((ushort) segmentID))
                 {
-                    var timedNode = TrafficLightsTimed.GetTimedLight((ushort) i);
+                    var timedNode = TrafficLightsTimed.GetTimedLight((ushort) segmentID);
 
                     configuration.timedNodes.Add(new int[4] { timedNode.nodeID, timedNode.currentStep, timedNode.NumSteps(), Convert.ToInt32(timedNode.isStarted())});
 
@@ -351,33 +334,26 @@ namespace KiwiManager
                 }
             }
 
-            for (var i = 0; i < Singleton<NetManager>.instance.m_nodes.m_buffer.Length; i++)
+            for (int nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID)
             {
-                var nodeFlags = Singleton<NetManager>.instance.m_nodes.m_buffer[i].m_flags;
-
-                if (nodeFlags != 0)
+                NetNode.Flags nodeFlags = Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags;
+                if (nodeFlags != 0 &&
+                    Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].Info.m_class.m_service == ItemClass.Service.Road)
                 {
-                    if (Singleton<NetManager>.instance.m_nodes.m_buffer[i].Info.m_class.m_service ==
-                        ItemClass.Service.Road)
-                    {
-                        configuration.nodeTrafficLights +=
-                            Convert.ToInt16((nodeFlags & NetNode.Flags.TrafficLights) != NetNode.Flags.None);
-                        configuration.nodeCrosswalk +=
-                            Convert.ToInt16((nodeFlags & NetNode.Flags.Junction) != NetNode.Flags.None);
-                    }
+                    configuration.nodeTrafficLights += ((nodeFlags & NetNode.Flags.TrafficLights) != 0) ? '1' : '0';
+                    configuration.nodeCrosswalk += ((nodeFlags & NetNode.Flags.Junction) != 0) ? '1' : '0';
                 }
             }
 
-            for (var i = 0; i < Singleton<NetManager>.instance.m_lanes.m_buffer.Length; i++)
+            for (int laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
             {
-                var laneSegment = Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_segment;
-
-                if (TrafficPriority.prioritySegments.ContainsKey(laneSegment))
+                ushort segmentID = Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_segment;
+                if (TrafficPriority.prioritySegments.ContainsKey(segmentID))
                 {
-                    configuration.laneFlags += string.Format("{0}:{1}:{2}:{3},", i,
-                            Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_flags,
-                            Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_firstTarget,
-                            Singleton<NetManager>.instance.m_lanes.m_buffer[i].m_lastTarget);
+                    configuration.laneFlags += string.Format("{0}:{1}:{2}:{3},", laneID,
+                            Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_flags,
+                            Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_firstTarget,
+                            Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_lastTarget);
                 }
             }
 

@@ -117,7 +117,7 @@ namespace KiwiManager
             this.m_bufferLock = PathManager.instance.m_bufferLock;
             this.m_pathUnits = PathManager.instance.m_pathUnits;
             this.m_queueLock = new object();
-            this.m_laneLocation = new uint[262144];
+            this.m_laneLocation = new uint[NetManager.MAX_LANE_COUNT];
             this.m_laneTarget = new PathUnit.Position[262144];
             this.m_bufferMin = new int[1024];
             this.m_bufferMax = new int[1024];
@@ -312,10 +312,9 @@ namespace KiwiManager
             this.m_bufferMaxPos = -1;
             if (this.m_pathFindIndex == 0u)
             {
-                uint num3 = 4294901760u;
-                for (int i = 0; i < 262144; i++)
+                for (int laneID = 0; laneID < this.m_laneLocation.Length; ++laneID)
                 {
-                    this.m_laneLocation[i] = num3;
+                    this.m_laneLocation[laneID] = 0xFFFF0000;
                 }
             }
             for (int j = 0; j < 1024; j++)
@@ -390,14 +389,13 @@ namespace KiwiManager
                         ushort endNode = instance.m_segments.m_buffer[(int)currentItem.m_position.m_segment].m_endNode;
                         this.ProcessItem1(currentItem, endNode, ref instance.m_nodes.m_buffer[(int)endNode], 255, false, ref data);
                     }
-                    int num6 = 0;
                     ushort num7 = instance.m_lanes.m_buffer[currentItem.m_laneID].m_nodes;
                     if (num7 != 0)
                     {
                         ushort startNode2 = instance.m_segments.m_buffer[(int)currentItem.m_position.m_segment].m_startNode;
                         ushort endNode2 = instance.m_segments.m_buffer[(int)currentItem.m_position.m_segment].m_endNode;
                         bool flag2 = ((instance.m_nodes.m_buffer[(int)startNode2].m_flags | instance.m_nodes.m_buffer[(int)endNode2].m_flags) & NetNode.Flags.Disabled) != NetNode.Flags.None;
-                        while (num7 != 0)
+                        for (int num6 = 0; num7 != 0 && num6 < NetManager.MAX_NODE_COUNT; ++num6)
                         {
                             NetInfo.Direction direction = NetInfo.Direction.None;
                             byte laneOffset = instance.m_nodes.m_buffer[(int)num7].m_laneOffset;
@@ -414,10 +412,6 @@ namespace KiwiManager
                                 this.ProcessItem1(currentItem, num7, ref instance.m_nodes.m_buffer[(int)num7], laneOffset, true, ref data);
                             }
                             num7 = instance.m_nodes.m_buffer[(int)num7].m_nextLaneNode;
-                            if (++num6 == 32768)
-                            {
-                                break;
-                            }
                         }
                     }
                 }
