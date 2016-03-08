@@ -90,10 +90,10 @@ namespace KiwiManager
             byte prevOffset, int index, out Vector3 pos, out Vector3 dir, out float maxSpeed)
         {
             NetManager instance = Singleton<NetManager>.instance;
-            instance.m_lanes.m_buffer[laneID].CalculatePositionAndDirection((float)offset * 0.003921569f, out pos, out dir);
+            instance.m_lanes.m_buffer[laneID].CalculatePositionAndDirection((float)offset * (1/255f), out pos, out dir);
             Vehicle.Frame lastFrameData = vehicleData.GetLastFrameData();
             Vector3 position2 = lastFrameData.m_position;
-            Vector3 b = instance.m_lanes.m_buffer[prevLaneID].CalculatePosition((float)prevOffset * 0.003921569f);
+            Vector3 b = instance.m_lanes.m_buffer[prevLaneID].CalculatePosition((float)prevOffset * (1/255f));
             float num = 0.5f * lastFrameData.m_velocity.sqrMagnitude / this.m_info.m_braking + this.m_info.m_generatedInfo.m_size.z * 0.5f;
 
             if (vehicleData.Info.m_vehicleType == VehicleInfo.VehicleType.Car)
@@ -482,7 +482,7 @@ namespace KiwiManager
         public void CalculateSegmentPosition2(ushort vehicleID, ref Vehicle vehicleData, PathUnit.Position position, uint laneID, byte offset, out Vector3 pos, out Vector3 dir, out float maxSpeed)
         {
             NetManager instance = Singleton<NetManager>.instance;
-            instance.m_lanes.m_buffer[laneID].CalculatePositionAndDirection((float)offset * 0.003921569f, out pos, out dir);
+            instance.m_lanes.m_buffer[laneID].CalculatePositionAndDirection((float)offset * (1/255f), out pos, out dir);
             NetInfo info = instance.m_segments.m_buffer[(int)position.m_segment].Info;
             if (info.m_lanes != null && info.m_lanes.Length > (int)position.m_lane)
             {
