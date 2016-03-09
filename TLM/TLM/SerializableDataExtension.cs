@@ -85,8 +85,13 @@ namespace KiwiManager
 
             Configuration configuration = Configuration.Deserialize(filepath);
 
+            bool[] prinodes = new bool[NetManager.MAX_NODE_COUNT];
             for (int i = 0; i < configuration.prioritySegments.Count; ++i)
             {
+                if (configuration.prioritySegments[i][2] == 0)
+                {
+                    continue;
+                }
                 if (!TrafficPriority.isPrioritySegment(
                         (ushort) configuration.prioritySegments[i][0],
                         (ushort) configuration.prioritySegments[i][1]))
@@ -95,11 +100,26 @@ namespace KiwiManager
                         (ushort) configuration.prioritySegments[i][0],
                         (ushort) configuration.prioritySegments[i][1],
                         (PrioritySegment.PriorityType) configuration.prioritySegments[i][2]);
+                    prinodes[configuration.prioritySegments[i][0]] = true;
                 }
                 else
                 {
                     Log.Warning(((ushort) configuration.prioritySegments[i][0]) + ">" + ((ushort) configuration.prioritySegments[i][1]) + ">" +
                             " has already been added as a priority segment!");
+                }
+            }
+            for (ushort nodeID = 0; nodeID < prinodes.Length; ++nodeID)
+            {
+                if (prinodes[nodeID])
+                {
+                    for (int j = 0; j < 8; ++j)
+                    {
+                        ushort segmentID = Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].GetSegment(j);
+                        if (!TrafficPriority.isPrioritySegment(nodeID, segmentID))
+                        {
+                            TrafficPriority.addPrioritySegment(nodeID, segmentID, PrioritySegment.PriorityType.None);
+                        }
+                    }
                 }
             }
 
@@ -242,18 +262,32 @@ namespace KiwiManager
                 }
             }
 
-            string[] lanes = configuration.laneFlags.Split(',');
+            NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
+            NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
+
+            string[] lanespecs = configuration.laneFlags.Split(',');
 
             Log.Message("got to lanes");
-            foreach (string lanespec in lanes)
+            bool[] ttouched = new bool[NetManager.MAX_SEGMENT_COUNT];
+            foreach (string lanespec in lanespecs)
             {
                 string[] split = lanespec.Split(':');
                 int laneid = Convert.ToInt32(split[0]);
-                Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags = Convert.ToUInt16(split[1]);
+                lanes[laneid].m_flags = Convert.ToUInt16(split[1]);
                 if (split.Length >= 4)
                 {
-                    Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_firstTarget = Convert.ToByte(split[2]);
-                    Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_lastTarget = Convert.ToByte(split[3]);
+                    byte firstTarget = Convert.ToByte(split[2]);
+                    if (lanes[laneid].m_firstTarget != firstTarget)
+                    {
+                        lanes[laneid].m_firstTarget = firstTarget;
+                        ttouched[lanes[laneid].m_segment] = true;
+                    }
+                    byte lastTarget = Convert.ToByte(split[3]);
+                    if (lanes[laneid].m_lastTarget != lastTarget)
+                    {
+                        lanes[laneid].m_lastTarget = lastTarget;
+                        ttouched[lanes[laneid].m_segment] = true;
+                    }
                 }
             }
         }
