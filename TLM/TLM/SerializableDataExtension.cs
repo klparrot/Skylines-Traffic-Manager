@@ -277,6 +277,34 @@ namespace KiwiManager
 //                lanes[laneid].m_flags = Convert.ToUInt16(split[1]);
                 if (split.Length >= 4)
                 {
+                    if (split.Length >= 5 && Convert.ToUInt16(split[4]) != lanes[laneid].m_segment)
+                    {
+                        Log.Warning(String.Format("laneID {0} has segmentID {1} but file says segmentID {2}",
+                                laneid, lanes[laneid].m_segment, Convert.ToUInt16(split[4])));
+                        continue;
+                    }
+                    if (lanes[laneid].m_firstTarget != Convert.ToByte(split[2]) || lanes[laneid].m_lastTarget != Convert.ToByte(split[3]))
+                    {
+                        NetInfo info = segments[lanes[laneid].m_segment].Info;
+                        uint olane = segments[lanes[laneid].m_segment].m_lanes;
+                        int lindex = 0;
+                        while (olane != laneid && olane != 0 && lindex < info.m_lanes.Length)
+                        {
+                            olane = lanes[olane].m_nextLane;
+                            ++lindex;
+                        }
+                        if (olane != laneid)
+                        {
+                            Log.Warning(String.Format("couldn't find laneID {0} in segmentID {1} lanes", laneid, lanes[laneid].m_segment));
+                            if (olane != 0) Log.Warning(String.Format("ran out of lanes in {0}!", info.name));
+                            continue;
+                        }
+                        if (info.m_lanes[lindex].m_laneType != NetInfo.LaneType.Vehicle)
+                        {
+                            Log.Warning(String.Format("laneID {0} is not a Vehicle lane (it's {1})", info.m_lanes[lindex].m_laneType));
+                            continue;
+                        }
+                    }
                     byte firstTarget = Convert.ToByte(split[2]);
                     if (lanes[laneid].m_firstTarget != firstTarget)
                     {
@@ -436,10 +464,11 @@ namespace KiwiManager
                 if (TrafficPriority.isPrioritySegment(segments[segmentID].m_startNode, segmentID) ||
                     TrafficPriority.isPrioritySegment(segments[segmentID].m_endNode, segmentID))
                 {
-                    configuration.laneFlags += string.Format("{0}:{1}:{2}:{3},", laneID,
+                    configuration.laneFlags += string.Format("{0}:{1}:{2}:{3}:{4},", laneID,
                             lanes[laneID].m_flags,
                             lanes[laneID].m_firstTarget,
-                            lanes[laneID].m_lastTarget);
+                            lanes[laneID].m_lastTarget,
+                            lanes[laneID].m_segment);
                 }
             }
 
