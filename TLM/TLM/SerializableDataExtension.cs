@@ -303,6 +303,9 @@ namespace KiwiManager
 
         public void OnSaveData()
         {
+            NetNode[] nodes = Singleton<NetManager>.instance.m_nodes.m_buffer;
+            NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
+            NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
 
             FastList<byte> data = new FastList<byte>();
 
@@ -323,8 +326,8 @@ namespace KiwiManager
 
             foreach (PrioritySegment priseg in TrafficPriority.prioritySegments.Values)
             {
-                if (priseg.nodeid == Singleton<NetManager>.instance.m_segments.m_buffer[priseg.segmentid].m_startNode ||
-                    priseg.nodeid == Singleton<NetManager>.instance.m_segments.m_buffer[priseg.segmentid].m_endNode)
+                if (priseg.nodeid == segments[priseg.segmentid].m_startNode ||
+                    priseg.nodeid == segments[priseg.segmentid].m_endNode)
                 {
                     configuration.prioritySegments.Add(new int[3] { priseg.nodeid, priseg.segmentid, (int) priseg.type });
                 }
@@ -418,9 +421,9 @@ namespace KiwiManager
 
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID)
             {
-                NetNode.Flags nodeFlags = Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags;
+                NetNode.Flags nodeFlags = nodes[nodeID].m_flags;
                 if (nodeFlags != 0 &&
-                    Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].Info.m_class.m_service == ItemClass.Service.Road)
+                    nodes[nodeID].Info.m_class.m_service == ItemClass.Service.Road)
                 {
                     configuration.nodeTrafficLights += ((nodeFlags & NetNode.Flags.TrafficLights) != 0) ? '1' : '0';
                     configuration.nodeCrosswalk += ((nodeFlags & NetNode.Flags.Junction) != 0) ? '1' : '0';
@@ -429,14 +432,14 @@ namespace KiwiManager
 
             for (uint laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
             {
-                ushort segmentID = Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_segment;
-                if (TrafficPriority.isPrioritySegment(Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].m_startNode, segmentID) ||
-                    TrafficPriority.isPrioritySegment(Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].m_endNode, segmentID))
+                ushort segmentID = lanes[laneID].m_segment;
+                if (TrafficPriority.isPrioritySegment(segments[segmentID].m_startNode, segmentID) ||
+                    TrafficPriority.isPrioritySegment(segments[segmentID].m_endNode, segmentID))
                 {
                     configuration.laneFlags += string.Format("{0}:{1}:{2}:{3},", laneID,
-                            Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_flags,
-                            Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_firstTarget,
-                            Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_lastTarget);
+                            lanes[laneID].m_flags,
+                            lanes[laneID].m_firstTarget,
+                            lanes[laneID].m_lastTarget);
                 }
             }
 
