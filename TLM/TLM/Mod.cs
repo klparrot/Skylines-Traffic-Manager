@@ -282,6 +282,7 @@ namespace KiwiManager
             //RedirectionHelper.RevertRedirect(typeof(CustomCargoTruckAI).GetMethod("SimulationStep", BindingFlags.NonPublic | BindingFlags.Instance), revertMethods[5]);
             //RedirectionHelper.RevertRedirect(typeof(CustomCarAI).GetMethod("CalculateSegmentPosition2"), revertMethods[6]);
             TrafficPriority.prioritySegments.Clear();
+            Array.Clear(TrafficPriority.changedTarget, 0, TrafficPriority.changedTarget.Length);
             CustomRoadAI.nodeDictionary.Clear();
             TrafficLightsManual.ManualSegments.Clear();
             TrafficLightsTimed.timedScripts.Clear();

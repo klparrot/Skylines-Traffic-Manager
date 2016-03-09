@@ -461,8 +461,7 @@ namespace KiwiManager
             for (uint laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
             {
                 ushort segmentID = lanes[laneID].m_segment;
-                if (TrafficPriority.isPrioritySegment(segments[segmentID].m_startNode, segmentID) ||
-                    TrafficPriority.isPrioritySegment(segments[segmentID].m_endNode, segmentID))
+                if (TrafficPriority.changedTarget[segmentID])
                 {
                     configuration.laneFlags += string.Format("{0}:{1}:{2}:{3}:{4},", laneID,
                             lanes[laneID].m_flags,

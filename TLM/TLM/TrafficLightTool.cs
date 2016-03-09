@@ -2596,6 +2596,8 @@ namespace KiwiManager
         }
         public static void UpdateLaneFlags(ushort nodeID, ushort segmentID)
         {
+            TrafficPriority.changedTarget[segmentID] = true;
+
             NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
             NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
 

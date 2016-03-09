@@ -15,6 +15,8 @@ namespace KiwiManager
 
         public static Dictionary<ushort, PriorityCar> vehicleList = new Dictionary<ushort, PriorityCar>();
 
+        public static bool[] changedTarget = new bool[NetManager.MAX_SEGMENT_COUNT];
+
         private static uint getKey(ushort nodeID, ushort segmentID)
         {
             if (nodeID != 0 && nodeID < NetManager.MAX_NODE_COUNT &&
