@@ -330,11 +330,11 @@ namespace KiwiManager
                 }
             }
 
-            for (int segmentID = 0; segmentID < NetManager.MAX_SEGMENT_COUNT; ++segmentID)
+            for (ushort segmentID = 0; segmentID < NetManager.MAX_SEGMENT_COUNT; ++segmentID)
             {
-                if (CustomRoadAI.nodeDictionary.ContainsKey((ushort) segmentID))
+                if (CustomRoadAI.nodeDictionary.ContainsKey(segmentID))
                 {
-                    var nodeDict = CustomRoadAI.nodeDictionary[(ushort)segmentID];
+                    var nodeDict = CustomRoadAI.nodeDictionary[segmentID];
 
                     configuration.nodeDictionary.Add(new int[4] {nodeDict.NodeId, Convert.ToInt32(nodeDict._manualTrafficLights), Convert.ToInt32(nodeDict._timedTrafficLights), Convert.ToInt32(nodeDict.TimedTrafficLightsActive)});
                 }
@@ -379,9 +379,9 @@ namespace KiwiManager
                     }
                 }
 
-                if (TrafficLightsTimed.timedScripts.ContainsKey((ushort) segmentID))
+                if (TrafficLightsTimed.timedScripts.ContainsKey(segmentID))
                 {
-                    var timedNode = TrafficLightsTimed.GetTimedLight((ushort) segmentID);
+                    var timedNode = TrafficLightsTimed.GetTimedLight(segmentID);
 
                     configuration.timedNodes.Add(new int[4] { timedNode.nodeID, timedNode.currentStep, timedNode.NumSteps(), Convert.ToInt32(timedNode.isStarted())});
 
@@ -416,7 +416,7 @@ namespace KiwiManager
                 }
             }
 
-            for (int nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID)
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID)
             {
                 NetNode.Flags nodeFlags = Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].m_flags;
                 if (nodeFlags != 0 &&
@@ -427,7 +427,7 @@ namespace KiwiManager
                 }
             }
 
-            for (int laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
+            for (uint laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
             {
                 ushort segmentID = Singleton<NetManager>.instance.m_lanes.m_buffer[laneID].m_segment;
                 if (TrafficPriority.isPrioritySegment(Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].m_startNode, segmentID) ||
