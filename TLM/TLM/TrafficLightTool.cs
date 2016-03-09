@@ -2570,6 +2570,112 @@ namespace KiwiManager
             }
         }
 
+        public static int GetOutgoingLaneCount(ushort nodeID, ushort segmentID)
+        {
+            NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
+            NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
+
+            int count = 0;
+
+            NetInfo.Direction dir = segments[segmentID].m_startNode == nodeID ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+            if ((segments[segmentID].m_flags & NetSegment.Flags.Invert) != 0) dir = NetInfo.InvertDirection(dir);
+            NetInfo.Direction dirT = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir) : dir;
+
+            NetInfo info = segments[segmentID].Info;
+            uint laneID = segments[segmentID].m_lanes;
+            for (uint i = 0; i < info.m_lanes.Length && laneID != 0; ++i)
+            {
+                NetInfo.Lane lane = info.m_lanes[i];
+                if ((lane.m_laneType & NetInfo.LaneType.Vehicle) != 0 && (lane.m_direction & dirT) != 0)
+                {
+                    ++count;
+                }
+                laneID = lanes[laneID].m_nextLane;
+            }
+            return count;
+        }
+        public static void UpdateLaneFlags(ushort nodeID, ushort segmentID)
+        {
+            NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
+            NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
+
+            List<OrderedLane> laneList = new List<OrderedLane>();
+
+            NetInfo.Direction dir = segments[segmentID].m_endNode == nodeID ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+            if ((segments[segmentID].m_flags & NetSegment.Flags.Invert) != 0) dir = NetInfo.InvertDirection(dir);
+            NetInfo.Direction dirT = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir) : dir;
+
+            NetInfo info = segments[segmentID].Info;
+            uint laneID = segments[segmentID].m_lanes;
+            for (uint i = 0; i < info.m_lanes.Length && laneID != 0; ++i)
+            {
+                NetInfo.Lane lane = info.m_lanes[i];
+                if ((lane.m_laneType & NetInfo.LaneType.Vehicle) != 0 && (lane.m_direction & dirT) != 0)
+                {
+                    laneList.Add(new OrderedLane(laneID, lane.m_position, i, dir));
+                }
+                laneID = lanes[laneID].m_nextLane;
+            }
+            laneList.Sort();
+
+            List<NetLane.Flags> targets = new List<NetLane.Flags>();
+            ushort existTurn = 0;
+            for (ushort outID = segments[segmentID].GetLeftSegment(nodeID);
+                    outID != 0 && outID != segmentID; outID = segments[outID].GetLeftSegment(nodeID))
+            {
+                NetLane.Flags turn = TrafficPriority.GetTurnDirection(segmentID, outID, nodeID);
+                existTurn |= (ushort) turn;
+                for (int i = GetOutgoingLaneCount(nodeID, outID); i > 0; --i)
+                {
+                    targets.Add(turn);
+                }
+            }
+
+            ushort allowTurn = 0;
+            foreach (OrderedLane lane in laneList)
+            {
+                if (lanes[lane.laneid].m_firstTarget <= targets.Count && lanes[lane.laneid].m_lastTarget <= targets.Count)
+                {
+                    ushort arrows = 0;
+                    for (int i = lanes[lane.laneid].m_firstTarget; i < lanes[lane.laneid].m_lastTarget; ++i)
+                    {
+                        arrows |= (ushort) targets[i];
+                    }
+                    allowTurn |= arrows;
+                    ushort flags = lanes[lane.laneid].m_flags;
+                    flags &= unchecked((ushort) ~NetLane.Flags.LeftForwardRight);
+                    flags |= (ushort) arrows;
+                    lanes[lane.laneid].m_flags = flags;
+                }
+            }
+            ushort banTurn = (ushort) ((existTurn & ~allowTurn) & (ushort) NetLane.Flags.LeftForwardRight);
+
+            ushort clearFlags = 0;
+            ushort applyFlags = 0;
+            if ((segments[segmentID].m_startNode == nodeID) ^ TrafficPriority.leftHandDrive)
+            {
+                clearFlags = (ushort) (NetLane.Flags.StartOneWayLeft | NetLane.Flags.StartOneWayRight);
+                if ((banTurn & (ushort) NetLane.Flags.Left) != 0) applyFlags |= (ushort) NetLane.Flags.StartOneWayLeft;
+                if ((banTurn & (ushort) NetLane.Flags.Right) != 0) applyFlags |= (ushort) NetLane.Flags.StartOneWayRight;
+            }
+            else
+            {
+                clearFlags = (ushort) (NetLane.Flags.EndOneWayLeft | NetLane.Flags.EndOneWayRight);
+                if ((banTurn & (ushort) NetLane.Flags.Left) != 0) applyFlags |= (ushort) NetLane.Flags.EndOneWayLeft;
+                if ((banTurn & (ushort) NetLane.Flags.Right) != 0) applyFlags |= (ushort) NetLane.Flags.EndOneWayRight;
+            }
+
+            laneID = segments[segmentID].m_lanes;
+            for (uint i = 0; i < info.m_lanes.Length && laneID != 0; ++i)
+            {
+                ushort flags = lanes[laneID].m_flags;
+                flags &= (ushort) ~clearFlags;
+                flags |= (ushort) applyFlags;
+                lanes[laneID].m_flags = flags;
+                laneID = lanes[laneID].m_nextLane;
+            }
+        }
+
         protected void _guiLaneChangeWindow(int num)
         {
             NetManager instance = Singleton<NetManager>.instance;
@@ -2723,6 +2829,8 @@ namespace KiwiManager
                 GUILayout.EndHorizontal();
                 if (update)
                 {
+                    UpdateLaneFlags(TrafficLightTool.SelectedNode, _selectedSegmentIdx);
+                    /*
                     if (!TrafficPriority.isPrioritySegment(TrafficLightTool.SelectedNode, _selectedSegmentIdx))
                     {
                         TrafficPriority.addPrioritySegment(TrafficLightTool.SelectedNode, _selectedSegmentIdx,
@@ -2782,6 +2890,7 @@ namespace KiwiManager
                             Singleton<NetManager>.instance.m_lanes.m_buffer[laneid].m_flags |= (ushort) flag;
                         }
                     }
+                    */
                 }
       //}
                 GUILayout.EndVertical();

@@ -273,7 +273,8 @@ namespace KiwiManager
             {
                 string[] split = lanespec.Split(':');
                 int laneid = Convert.ToInt32(split[0]);
-                lanes[laneid].m_flags = Convert.ToUInt16(split[1]);
+                if ((lanes[laneid].m_flags & (ushort) NetLane.Flags.Created) == 0) continue;
+//                lanes[laneid].m_flags = Convert.ToUInt16(split[1]);
                 if (split.Length >= 4)
                 {
                     byte firstTarget = Convert.ToByte(split[2]);
@@ -288,6 +289,14 @@ namespace KiwiManager
                         lanes[laneid].m_lastTarget = lastTarget;
                         ttouched[lanes[laneid].m_segment] = true;
                     }
+                }
+            }
+            for (ushort segmentID = 0; segmentID < ttouched.Length; ++segmentID)
+            {
+                if (ttouched[segmentID])
+                {
+                    TrafficLightTool.UpdateLaneFlags(segments[segmentID].m_startNode, segmentID);
+                    TrafficLightTool.UpdateLaneFlags(segments[segmentID].m_endNode, segmentID);
                 }
             }
         }
