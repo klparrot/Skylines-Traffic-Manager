@@ -15,7 +15,32 @@ namespace KiwiManager
 
         public static Dictionary<ushort, PriorityCar> vehicleList = new Dictionary<ushort, PriorityCar>();
 
-        public static bool[] changedTarget = new bool[NetManager.MAX_SEGMENT_COUNT];
+        public static NetInfo.Direction[] changedTarget = new NetInfo.Direction[NetManager.MAX_SEGMENT_COUNT];
+
+        public static NetInfo.Direction GetLaneDirection(uint laneID)
+        {
+            NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
+            NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
+            ushort segmentID = lanes[laneID].m_segment;
+            NetInfo info = segments[segmentID].Info;
+            uint olane = segments[segmentID].m_lanes;
+            int lindex = 0;
+            while (olane != laneID && olane != 0 && lindex < info.m_lanes.Length)
+            {
+                olane = lanes[olane].m_nextLane;
+                ++lindex;
+            }
+            if (olane != 0 && lindex < info.m_lanes.Length)
+            {
+                NetInfo.Direction dir = info.m_lanes[lindex].m_direction;
+                if (TrafficPriority.leftHandDrive ^
+                        ((segments[segmentID].m_flags & NetSegment.Flags.Invert) != 0))
+                    dir = NetInfo.InvertDirection(dir);
+                return dir;
+            }
+            Log.Warning("unable to find lane info for laneID " + laneID);
+            return NetInfo.Direction.None;
+        }
 
         private static uint getKey(ushort nodeID, ushort segmentID)
         {

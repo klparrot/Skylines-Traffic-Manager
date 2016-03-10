@@ -2596,14 +2596,15 @@ namespace KiwiManager
         }
         public static void UpdateLaneFlags(ushort nodeID, ushort segmentID)
         {
-            TrafficPriority.changedTarget[segmentID] = true;
-
             NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
             NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
 
             List<OrderedLane> laneList = new List<OrderedLane>();
 
             NetInfo.Direction dir = segments[segmentID].m_endNode == nodeID ? NetInfo.Direction.Forward : NetInfo.Direction.Backward;
+            TrafficPriority.changedTarget[segmentID] = (NetInfo.Direction)
+                    (TrafficPriority.changedTarget[segmentID] | dir);
+
             if ((segments[segmentID].m_flags & NetSegment.Flags.Invert) != 0) dir = NetInfo.InvertDirection(dir);
             NetInfo.Direction dirT = TrafficPriority.leftHandDrive ? NetInfo.InvertDirection(dir) : dir;
 

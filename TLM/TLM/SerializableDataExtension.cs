@@ -268,11 +268,10 @@ namespace KiwiManager
             string[] lanespecs = configuration.laneFlags.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
 
             Log.Message("got to lanes");
-            bool[] ttouched = new bool[NetManager.MAX_SEGMENT_COUNT];
             foreach (string lanespec in lanespecs)
             {
                 string[] split = lanespec.Split(':');
-                int laneid = Convert.ToInt32(split[0]);
+                uint laneid = Convert.ToUInt32(split[0]);
                 if ((lanes[laneid].m_flags & (ushort) NetLane.Flags.Created) == 0) continue;
 //                lanes[laneid].m_flags = Convert.ToUInt16(split[1]);
                 if (split.Length >= 4)
@@ -305,26 +304,35 @@ namespace KiwiManager
                             continue;
                         }
                     }
+                    bool ttouched = false;
                     byte firstTarget = Convert.ToByte(split[2]);
                     if (lanes[laneid].m_firstTarget != firstTarget)
                     {
                         lanes[laneid].m_firstTarget = firstTarget;
-                        ttouched[lanes[laneid].m_segment] = true;
+                        ttouched = true;
                     }
                     byte lastTarget = Convert.ToByte(split[3]);
                     if (lanes[laneid].m_lastTarget != lastTarget)
                     {
                         lanes[laneid].m_lastTarget = lastTarget;
-                        ttouched[lanes[laneid].m_segment] = true;
+                        ttouched = true;
+                    }
+                    if (ttouched)
+                    {
+                        TrafficPriority.changedTarget[lanes[laneid].m_segment] = (NetInfo.Direction)
+                                (TrafficPriority.changedTarget[lanes[laneid].m_segment] | TrafficPriority.GetLaneDirection(laneid));
                     }
                 }
             }
-            for (ushort segmentID = 0; segmentID < ttouched.Length; ++segmentID)
+            for (ushort segmentID = 0; segmentID < TrafficPriority.changedTarget.Length; ++segmentID)
             {
-                if (ttouched[segmentID])
+                if ((TrafficPriority.changedTarget[segmentID] & NetInfo.Direction.Forward) != 0)
+                {
+                    TrafficLightTool.UpdateLaneFlags(segments[segmentID].m_endNode, segmentID);
+                }
+                if ((TrafficPriority.changedTarget[segmentID] & NetInfo.Direction.Backward) != 0)
                 {
                     TrafficLightTool.UpdateLaneFlags(segments[segmentID].m_startNode, segmentID);
-                    TrafficLightTool.UpdateLaneFlags(segments[segmentID].m_endNode, segmentID);
                 }
             }
         }
@@ -461,7 +469,7 @@ namespace KiwiManager
             for (uint laneID = 0; laneID < NetManager.MAX_LANE_COUNT; ++laneID)
             {
                 ushort segmentID = lanes[laneID].m_segment;
-                if (TrafficPriority.changedTarget[segmentID])
+                if (TrafficPriority.changedTarget[segmentID] != NetInfo.Direction.None)
                 {
                     configuration.laneFlags += string.Format("{0}:{1}:{2}:{3}:{4},", laneID,
                             lanes[laneID].m_flags,
