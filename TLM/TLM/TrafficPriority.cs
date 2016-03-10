@@ -31,17 +31,36 @@ namespace KiwiManager
         }
         public static void addPrioritySegment(ushort nodeID, ushort segmentID, PrioritySegment.PriorityType type)
         {
-            prioritySegments.Add(getKey(nodeID, segmentID), new PrioritySegment(nodeID, segmentID, type));
+            try
+            {
+                prioritySegments.Add(getKey(nodeID, segmentID), new PrioritySegment(nodeID, segmentID, type));
+            }
+            catch (IndexOutOfRangeException ioore)
+            {
+            }
         }
 
         public static void removePrioritySegment(ushort nodeID, ushort segmentID)
         {
-            prioritySegments.Remove(getKey(nodeID, segmentID));
+            try
+            {
+                prioritySegments.Remove(getKey(nodeID, segmentID));
+            }
+            catch (IndexOutOfRangeException ioore)
+            {
+            }
         }
 
         public static bool isPrioritySegment(ushort nodeID, ushort segmentID)
         {
-            return prioritySegments.ContainsKey(getKey(nodeID, segmentID));
+            try
+            {
+                return prioritySegments.ContainsKey(getKey(nodeID, segmentID));
+            }
+            catch (IndexOutOfRangeException ioore)
+            {
+                return false;
+            }
         }
 
         public static PrioritySegment getPrioritySegment(ushort nodeID, ushort segmentID)
@@ -49,6 +68,10 @@ namespace KiwiManager
             try
             {
                 return prioritySegments[getKey(nodeID, segmentID)];
+            }
+            catch (IndexOutOfRangeException ioore)
+            {
+                return null;
             }
             catch (KeyNotFoundException knfe)
             {

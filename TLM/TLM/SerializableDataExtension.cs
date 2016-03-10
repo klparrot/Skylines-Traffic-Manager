@@ -115,7 +115,7 @@ namespace KiwiManager
                     for (int j = 0; j < 8; ++j)
                     {
                         ushort segmentID = Singleton<NetManager>.instance.m_nodes.m_buffer[nodeID].GetSegment(j);
-                        if (!TrafficPriority.isPrioritySegment(nodeID, segmentID))
+                        if (segmentID != 0 && !TrafficPriority.isPrioritySegment(nodeID, segmentID))
                         {
                             TrafficPriority.addPrioritySegment(nodeID, segmentID, PrioritySegment.PriorityType.None);
                         }
@@ -265,7 +265,7 @@ namespace KiwiManager
             NetSegment[] segments = Singleton<NetManager>.instance.m_segments.m_buffer;
             NetLane[] lanes = Singleton<NetManager>.instance.m_lanes.m_buffer;
 
-            string[] lanespecs = configuration.laneFlags.Split(',');
+            string[] lanespecs = configuration.laneFlags.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
 
             Log.Message("got to lanes");
             bool[] ttouched = new bool[NetManager.MAX_SEGMENT_COUNT];
